@@ -7,7 +7,7 @@
 | فاز | نام | وضعیت | وابسته به |
 |---|---|---|---|
 | ۰ | مستندات و تصمیمات | ✅ تکمیل | — |
-| ۱ | زیرساخت و سیستم طراحی | ⬜ آماده | فاز ۰ |
+| ۱ | زیرساخت و سیستم طراحی | 🔶 کد کامل، تأیید SDK باقی | فاز ۰ |
 | ۲ | لایه داده و بکاپ | ⬜ | فاز ۱ |
 | ۳ | ماژولهای عملیاتی + Quick Add | ⬜ | فاز ۲ |
 | ۴ | داشبورد امروز و پولیش | ⬜ | فاز ۳ |
@@ -35,18 +35,18 @@
 
 ### کارها
 
-- [ ] اجرای `flutter create` در ریشه ریپو با org `ir.madaar` و project `madaar`
-- [ ] ایجاد `.fvmrc` و قفل Flutter 3.50.1، تنظیم `minSdk 26`
-- [ ] `pubspec.yaml` با وابستگیها: riverpod + annotations + generator، drift + drift_dev + sqlite3_flutter_libs + path_provider، go_router، shamsi_date، intl، lucide_icons_flutter، fl_chart، flutter_animate، flutter_local_notifications، local_auth، file_picker، share_plus
-- [ ] باندل ۵ فونت Vazirmatn v33.003 + `OFL.txt` (از مخزن رسمی)
-- [ ] `AppColors`، `AppTypography`، `AppTheme` براساس [`03-DESIGN_SYSTEM.md`](03-DESIGN_SYSTEM.md)
-- [ ] `JalaliHelper` + `CurrencyFormatter` + `Haptics` با تست unit
-- [ ] `Directionality.rtl`، لوکال `fa_IR`، اعداد فارسی و `tabularFigures`
-- [ ] `GoRouter` + `StatefulShellRoute` با ۵ مسیر و حفظ state تبها
-- [ ] `BentoCard`، `FloatingGlassDock` (۵ تب + `+`)، `EmptyStateView`
-- [ ] صفحات اسکلت خالی (بدون داده ساختگی) برای ۵ ماژول
-- [ ] `.gitignore` شامل `key.properties`، `*.jks`، `build/`، `.fvm/`، فایلهای generated ناسازگار
-- [ ] `analysis_options.yaml` با قواعد سختگیرانه، `flutter analyze` سبز
+- [x] اسکلت معادل `flutter create` در ریشه ریپو (org `ir.madaar`، project `madaar`)
+- [x] ایجاد `.fvmrc` و قفل Flutter 3.50.1، تنظیم `minSdk 26`
+- [x] `pubspec.yaml` با وابستگیها: riverpod + annotations + generator، drift + drift_dev + sqlite3_flutter_libs + path_provider، go_router، shamsi_date، intl، lucide_icons_flutter، fl_chart، flutter_animate، flutter_local_notifications، local_auth، file_picker، share_plus
+- [x] باندل ۵ فونت Vazirmatn v33.003 + `OFL.txt` (از مخزن رسمی)
+- [x] `AppColors`، `AppTypography`، `AppTheme` براساس [`03-DESIGN_SYSTEM.md`](03-DESIGN_SYSTEM.md)
+- [x] `JalaliHelper` + `CurrencyFormatter` + `Haptics` با تست unit
+- [x] `Directionality.rtl`، لوکال `fa_IR`، اعداد فارسی و `tabularFigures`
+- [x] `GoRouter` + `StatefulShellRoute` با ۵ مسیر و حفظ state تبها
+- [x] `BentoCard`، `FloatingGlassDock` (۵ تب + `+`)، `EmptyStateView`
+- [x] صفحات اسکلت خالی (بدون داده ساختگی) برای ۵ ماژول
+- [x] `.gitignore` شامل `key.properties`، `*.jks`، `build/`، `.fvm/`، فایلهای generated ناسازگار
+- [x] `analysis_options.yaml` با قواعد سختگیرانه (اجرای analyze در محیط SDK باقی است)
 
 ### معیار خروج
 
@@ -54,6 +54,8 @@
 - تمام متنها فارسی و RTLاند؛ تاریخ و اعداد شمسی/فارسی نمایش داده میشوند.
 - جابهجایی تبها scroll و state را حفظ میکند.
 - `flutter analyze` و `flutter test` بدون خطا.
+
+> **وضعیت اجرا (۲۰۲۶‑۱۱‑۲۴):** تمام موارد فاز ۱ پیادهسازی شدند. چون Flutter SDK و pub.dev در محیط اجرا در دسترس نبودند، آنالیز و تست اجرا نشدند؛ پیش از شروع فاز ۲، دستور `bash tools/verify_phase1.sh` را در محیط مجهز اجرا کنید.
 
 ---
 
