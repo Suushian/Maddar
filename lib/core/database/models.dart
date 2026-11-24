@@ -44,6 +44,31 @@ class TaskModel {
   final String? completedAt;
   final String createdAt;
 
+  TaskModel copyWith({
+    String? title,
+    String? note,
+    String? pillar,
+    String? dueDate,
+    String? focusDate,
+    bool? isTopFocus,
+    int? priority,
+    bool? isCompleted,
+    String? completedAt,
+  }) =>
+      TaskModel(
+        id: id,
+        title: title ?? this.title,
+        note: note ?? this.note,
+        pillar: pillar ?? this.pillar,
+        dueDate: dueDate ?? this.dueDate,
+        focusDate: focusDate ?? this.focusDate,
+        isTopFocus: isTopFocus ?? this.isTopFocus,
+        priority: priority ?? this.priority,
+        isCompleted: isCompleted ?? this.isCompleted,
+        completedAt: completedAt ?? this.completedAt,
+        createdAt: createdAt,
+      );
+
   factory TaskModel.fromRow(QueryRow row) => TaskModel(
         id: row.readInt('id'),
         title: row.readString('title'),
@@ -366,6 +391,26 @@ class SettingsModel {
   final String? dailyReminderTime;
   final bool onboardingCompleted;
   final String updatedAt;
+
+  SettingsModel copyWith({
+    String? userName,
+    String? themeMode,
+    int? monthlyBudget,
+    bool? biometricLockEnabled,
+    String? dailyReminderTime,
+    bool? onboardingCompleted,
+  }) =>
+      SettingsModel(
+        id: id,
+        userName: userName ?? this.userName,
+        themeMode: themeMode ?? this.themeMode,
+        monthlyBudget: monthlyBudget ?? this.monthlyBudget,
+        biometricLockEnabled:
+            biometricLockEnabled ?? this.biometricLockEnabled,
+        dailyReminderTime: dailyReminderTime ?? this.dailyReminderTime,
+        onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+        updatedAt: updatedAt,
+      );
 
   factory SettingsModel.fromRow(QueryRow row) => SettingsModel(
         id: row.readInt('id'),
