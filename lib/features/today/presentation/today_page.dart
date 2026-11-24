@@ -1,22 +1,38 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madaar/core/database/database_providers.dart';
+import 'package:madaar/core/database/models.dart';
+import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
 import 'package:madaar/core/widgets/module_header.dart';
 import 'package:madaar/core/widgets/universal_quick_add.dart';
+import 'package:madaar/features/today/application/today_summary.dart';
 
-/// مرکز فرماندهی امروز. در فاز ۱ ساختار کارتها و تاریخ واقعی نمایش داده میشود؛
-/// استریمهای Drift در فاز ۴ به کارتها متصل میشوند.
-class TodayPage extends StatelessWidget {
+/// مرکز فرماندهی امروز: تمام ارقام از استریمهای Drift میآیند.
+class TodayPage extends ConsumerWidget {
   const TodayPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final DateTime now = DateTime.now();
     final Color tasksColor = AppColors.accent(context, MadaarAccent.tasks);
     final Color habitsColor = AppColors.accent(context, MadaarAccent.habits);
     final Color journalColor = AppColors.accent(context, MadaarAccent.journal);
+    final AsyncValue<TodaySummary> summaryAsync =
+        ref.watch(todaySummaryProvider);
+    final TodaySummary summary = summaryAsync.value ??
+        const TodaySummary(
+          progressPercent: 0,
+          focusCount: 0,
+          doneHabits: 0,
+          eligibleHabits: 0,
+          spentToday: 0,
+          moodScore: null,
+        );
 
     return Scaffold(
       body: SafeArea(
@@ -33,7 +49,7 @@ class TodayPage extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: <Widget>[
-                    _ProgressRing(percent: 0),
+                    _ProgressRing(percent: summary.progressPercent),
                     const SizedBox(width: 16),
                     Expanded(
                       child: Column(
@@ -45,7 +61,9 @@ class TodayPage extends StatelessWidget {
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            'کارها و عادتهای امروز اینجا جمع میشوند.',
+                            '${JalaliHelper.faDigits(summary.doneHabits)} از '
+                            '${JalaliHelper.faDigits(summary.eligibleHabits)} عادت '
+                            'و ${JalaliHelper.faDigits(summary.focusCount)} تمرکز',
                             style: Theme.of(context).textTheme.bodySmall,
                           ),
                         ],
@@ -76,7 +94,7 @@ class TodayPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'هنوز کاری پین نشده است',
+                              '${JalaliHelper.faDigits(summary.focusCount)} کار پین شده است',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -84,6 +102,47 @@ class TodayPage extends StatelessWidget {
                       ),
                       const Icon(Icons.add_rounded, size: 20),
                     ],
+                  ),
+                ),
+              ),
+            ),
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
+                child: AsyncRepoView<TasksRepository>(
+                  value: ref.watch(tasksRepositoryProvider),
+                  builder: (TasksRepository repo) => StreamBuilder<
+                      List<TaskModel>>(
+                    stream: repo.watchFocus(JalaliHelper.dateKey(now)),
+                    builder: (
+                      BuildContext context,
+                      AsyncSnapshot<List<TaskModel>> snapshot,
+                    ) {
+                      final List<TaskModel> focus =
+                          snapshot.data ?? const <TaskModel>[];
+                      if (focus.isEmpty) {
+                        return const SizedBox.shrink();
+                      }
+                      return Column(
+                        children: <Widget>[
+                          for (final TaskModel task in focus)
+                            CheckboxListTile(
+                              contentPadding: EdgeInsets.zero,
+                              value: task.isCompleted,
+                              onChanged: (_) =>
+                                  repo.toggleCompleted(task.id),
+                              title: Text(
+                                task.title,
+                                style: TextStyle(
+                                  decoration: task.isCompleted
+                                      ? TextDecoration.lineThrough
+                                      : null,
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
                 ),
               ),
@@ -97,7 +156,8 @@ class TodayPage extends StatelessWidget {
                   onTap: () => UniversalQuickAdd.show(context, initialTab: 3),
                   child: Row(
                     children: <Widget>[
-                      Icon(Icons.local_fire_department_rounded, color: habitsColor),
+                      Icon(Icons.local_fire_department_rounded,
+                          color: habitsColor),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
@@ -109,7 +169,7 @@ class TodayPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              'یک لمس تا تیک بخورند',
+                              '${JalaliHelper.faDigits(summary.doneHabits)} عادت انجام شد',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -141,14 +201,11 @@ class TodayPage extends StatelessWidget {
                             ),
                             const Spacer(),
                             Text(
-                              CurrencyFormatter.format(0),
+                              CurrencyFormatter.format(summary.spentToday),
                               style: Theme.of(context).textTheme.headlineMedium,
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              'بودجه تنظیم نشده',
-                              style: Theme.of(context).textTheme.bodySmall,
-                            ),
+                            const Text('هزینه ثبتشده امروز'),
                           ],
                         ),
                       ),
@@ -172,7 +229,9 @@ class TodayPage extends StatelessWidget {
                                 color: journalColor, size: 30),
                             const SizedBox(height: 4),
                             Text(
-                              'ثبت نشده است',
+                              summary.moodScore == null
+                                  ? 'ثبت نشده است'
+                                  : 'خلق: ${JalaliHelper.faDigits(summary.moodScore!)}/۵',
                               style: Theme.of(context).textTheme.bodySmall,
                             ),
                           ],
@@ -205,7 +264,7 @@ class _ProgressRing extends StatelessWidget {
         alignment: Alignment.center,
         children: <Widget>[
           CircularProgressIndicator(
-            value: 0.0,
+            value: (percent / 100).clamp(0.0, 1.0).toDouble(),
             strokeWidth: 6,
             backgroundColor: AppColors.borderSubtle(context),
             color: AppColors.brand(context),

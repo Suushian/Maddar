@@ -175,6 +175,36 @@ class TasksRepository extends ChangeEmitter {
     emitChange();
   }
 
+  /// بازگردانی وضعیت پیشین کار (Undo بعد از swipe یا حذف).
+  /// UPSERT کار همیشه با همان شناسه بازگردانده میشود.
+  Future<void> restoreTask(TaskModel task) async {
+    await _db.customStatement(
+      'INSERT INTO tasks (id, title, note, pillar, due_date, focus_date, '
+      'is_top_focus, priority, is_completed, completed_at, created_at) '
+      'VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) '
+      'ON CONFLICT(id) DO UPDATE SET title = excluded.title, '
+      'note = excluded.note, pillar = excluded.pillar, '
+      'due_date = excluded.due_date, focus_date = excluded.focus_date, '
+      'is_top_focus = excluded.is_top_focus, priority = excluded.priority, '
+      'is_completed = excluded.is_completed, '
+      'completed_at = excluded.completed_at, created_at = excluded.created_at',
+      <dynamic>[
+        task.id,
+        task.title,
+        task.note,
+        task.pillar,
+        task.dueDate,
+        task.focusDate,
+        task.isTopFocus ? 1 : 0,
+        task.priority,
+        task.isCompleted ? 1 : 0,
+        task.completedAt,
+        task.createdAt,
+      ],
+    );
+    emitChange();
+  }
+
   Future<void> delete(int id) async {
     await _db.customStatement('DELETE FROM tasks WHERE id = ?', <dynamic>[id]);
     emitChange();

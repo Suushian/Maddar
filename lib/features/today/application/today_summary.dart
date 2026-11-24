@@ -51,7 +51,11 @@ final StreamProvider<TodaySummary> todaySummaryProvider =
         .where(
           (tx) =>
               tx.type == 'expense' &&
-              JalaliHelper.dateKey(DateTime.parse(tx.transactedAt)) == key,
+              JalaliHelper.dateKey(
+                    DateTime.tryParse(tx.transactedAt)?.toLocal() ??
+                        DateTime.fromMillisecondsSinceEpoch(0),
+                  ) ==
+                  key,
         )
         .fold<int>(0, (int sum, tx) => sum + tx.amount);
     final int focusDone = focus.where((task) => task.isCompleted).length;
