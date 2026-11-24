@@ -8,7 +8,7 @@
 |---|---|---|---|
 | ۰ | مستندات و تصمیمات | ✅ تکمیل | — |
 | ۱ | زیرساخت و سیستم طراحی | 🔶 کد کامل، تأیید SDK باقی | فاز ۰ |
-| ۲ | لایه داده و بکاپ | ⬜ | فاز ۱ |
+| ۲ | لایه داده و بکاپ | 🔶 کد کامل، تأیید SDK باقی | فاز ۱ |
 | ۳ | ماژولهای عملیاتی + Quick Add | ⬜ | فاز ۲ |
 | ۴ | داشبورد امروز و پولیش | ⬜ | فاز ۳ |
 | ۵ | CI/CD و تحویل | ⬜ | فاز ۴ |
@@ -65,19 +65,19 @@
 
 ### کارها
 
-- [ ] تعریف ۷ جدول مطابق [`04-DATA_MODEL.md`](04-DATA_MODEL.md) (شامل `focus_date`، `repeat_type`، `due_day`)
-- [ ] `AppDatabase` + `MigrationStrategy` + `foreign_keys = ON`
-- [ ] اعمال CHECK و UNIQUE و ایندکسها؛ تست Migration v1
-- [ ] DAOs و Repositoryها با متدهای تراکنشی:
+- [x] تعریف ۷ جدول مطابق [`04-DATA_MODEL.md`](04-DATA_MODEL.md) (شامل `focus_date`، `repeat_type`، `due_day`)
+- [x] `AppDatabase` + `MigrationStrategy` + `foreign_keys = ON`
+- [x] اعمال CHECK و UNIQUE و ایندکسها؛ تست Migration v1
+- [x] DAOs و Repositoryها با متدهای تراکنشی:
   - `setTopFocus` با محدودیت ۳
   - `toggleHabitLog` (upsert)
   - `addTransaction`, `markBillPaid`
   - `upsertJournal`
-- [ ] Riverpod StreamProviders و `todaySummaryProvider`
-- [ ] منطق pure: `StreakCalculator`، `BudgetCalculator`، `RepeatRuleMatcher` + تست
-- [ ] `BackupService`: export JSON نسخهدار، import اعتبارسنجیشده با اسsnapshot
-- [ ] `SettingsRepository` تک ردیف و onboarding flag
-- [ ] تستRepositoryها با in-memory SQLite (جداول واقعی، نه mockها)
+- [x] Riverpod StreamProviders و `todaySummaryProvider`
+- [x] منطق pure: `StreakCalculator`، `BudgetCalculator`، `RepeatRuleMatcher` + تست
+- [x] `BackupService`: export JSON نسخهدار، import اعتبارسنجیشده با اسنپشات
+- [x] `SettingsRepository` تک ردیف و onboarding flag
+- [x] تستRepositoryها با in-memory SQLite (جداول واقعی، نه mockها)
 
 ### معیار خروج
 
@@ -85,6 +85,8 @@
 - چهارمین تلاش تمرکز، رد میشود و داده دستنخورده میماند.
 - بکاپ → ریست → بازیابی، تمام ۷ جدول را باز میگرداند.
 - تست migration و محاسبات سبز.
+
+> **وضعیت اجرا (۲۰۲۶‑۱۱‑۲۴):** تمام موارد فاز ۲ پیادهسازی شدند. جزئیات تفاوت پیادهسازی (SQL خام Drift بهجای codegen) در [`PHASE2_NOTES.md`](PHASE2_NOTES.md) است. اجرای `flutter test` در محیط دارای SDK باقی است.
 
 ---
 
