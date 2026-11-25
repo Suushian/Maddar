@@ -52,7 +52,7 @@ class _BiometricGateState extends ConsumerState<BiometricGate>
         localizedReason: 'برای ورود به مدار هویت خود را تأیید کنید',
         options: const AuthenticationOptions(
           biometricOnly: true,
-          stickyAuthentication: false,
+          stickyAuth: false,
         ),
       );
       await Haptics.success();

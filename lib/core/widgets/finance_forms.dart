@@ -244,7 +244,7 @@ class _AmountKeypad extends StatelessWidget {
               child: Text(
                 key == '⌫' ? '⟵' : key == 'C' ? 'C' : key.startsWith('+')
                     ? key == '+50000' ? '+۵۰ هزار' : '+۱۰۰ هزار'
-                    : CurrencyFormatter.faDigits(key),
+                    : JalaliHelper.faDigits(key),
               ),
             ),
           ),

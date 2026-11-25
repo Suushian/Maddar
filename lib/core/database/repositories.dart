@@ -27,6 +27,14 @@ abstract class ChangeEmitter {
       yield await read();
     }
   }
+
+  /// استریم برای کوئریهای تکمقداری مانند تنظیمات.
+  Stream<T> reactiveValue<T>(Future<T> Function() read) async* {
+    yield await read();
+    await for (final _ in changes) {
+      yield await read();
+    }
+  }
 }
 
 class TasksRepository extends ChangeEmitter {
@@ -462,7 +470,7 @@ class SettingsRepository extends ChangeEmitter {
     return SettingsModel.fromRow(rows.first);
   }
 
-  Stream<SettingsModel> watch() => reactive(get);
+  Stream<SettingsModel> watch() => reactiveValue(get);
 
   Future<void> update(SettingsModel value) async {
     await _db.customStatement(

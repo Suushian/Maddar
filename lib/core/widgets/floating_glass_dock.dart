@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
@@ -63,7 +65,7 @@ class FloatingGlassDock extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(32),
               child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+                filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Row(
                   children: <Widget>[
                     for (int i = 0; i < _labels.length; i++)
