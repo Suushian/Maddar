@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madaar/core/database/database_providers.dart';
-import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
