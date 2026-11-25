@@ -129,22 +129,27 @@ class TodayPage extends ConsumerWidget {
                       }
                       return Column(
                         children: <Widget>[
-                          for (final TaskModel task in focus)
-                            CheckboxListTile(
-                              contentPadding: EdgeInsets.zero,
-                              value: task.isCompleted,
-                              onChanged: (_) async {
-                                await Haptics.toggle();
-                                await repo.toggleCompleted(task.id);
-                              },
-                              title: Text(
-                                task.title,
-                                style: TextStyle(
-                                  decoration: task.isCompleted
-                                      ? TextDecoration.lineThrough
-                                      : null,
+                          for (int index = 0; index < focus.length; index++)
+                            Motion.entrance(
+                              context,
+                              CheckboxListTile(
+                                contentPadding: EdgeInsets.zero,
+                                value: focus[index].isCompleted,
+                                onChanged: (_) async {
+                                  await Haptics.toggle();
+                                  await repo.toggleCompleted(focus[index].id);
+                                },
+                                title: Text(
+                                  focus[index].title,
+                                  style: TextStyle(
+                                    decoration: focus[index].isCompleted
+                                        ? TextDecoration.lineThrough
+                                        : null,
+                                  ),
                                 ),
                               ),
+                              index,
+                              id: 'focus-${focus[index].id}',
                             ),
                         ],
                       );
@@ -315,7 +320,7 @@ class _HabitStrip extends StatelessWidget {
                     completedDateKeys: habitDays,
                     today: now,
                   );
-                  return Motion.spring(
+                  return Motion.press(
                     context,
                     ActionChip(
                       avatar: Icon(
@@ -356,20 +361,33 @@ class _ProgressRing extends StatelessWidget {
     return SizedBox(
       width: 64,
       height: 64,
-      child: Stack(
-        alignment: Alignment.center,
-        children: <Widget>[
-          CircularProgressIndicator(
-            value: (percent / 100).clamp(0.0, 1.0).toDouble(),
-            strokeWidth: 6,
-            backgroundColor: AppColors.borderSubtle(context),
-            color: AppColors.brand(context),
-          ),
-          Text(
-            '${JalaliHelper.faDigits(percent)}٪',
-            style: Theme.of(context).textTheme.labelMedium,
-          ),
-        ],
+      child: TweenAnimationBuilder<double>(
+        key: const ValueKey<String>('progress-ring'),
+        tween: Tween<double>(
+          begin: (percent / 100).clamp(0.0, 1.0).toDouble(),
+          end: (percent / 100).clamp(0.0, 1.0).toDouble(),
+        ),
+        duration: Motion.slow,
+        curve: Curves.easeOutCubic,
+        builder: (BuildContext context, double value, Widget? child) => Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            CircularProgressIndicator(
+              value: value,
+              strokeWidth: 6,
+              backgroundColor: AppColors.borderSubtle(context),
+              color: AppColors.brand(context),
+            ),
+            child ?? const SizedBox.shrink(),
+          ],
+        ),
+        child: Motion.number(
+          context,
+          percent,
+          (num value) => '${JalaliHelper.faDigits(value.round())}٪',
+          style: Theme.of(context).textTheme.labelMedium,
+          id: 'progress-percent',
+        ),
       ),
     );
   }

@@ -10,6 +10,7 @@ import 'package:madaar/core/notifications/notification_providers.dart';
 import 'package:madaar/core/state/app_providers.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
 import 'package:madaar/core/utils/haptics.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -33,7 +34,9 @@ class SettingsPage extends ConsumerWidget {
                 const SettingsModel(updatedAt: '1970-01-01T00:00:00.000Z');
             return ListView(
               children: <Widget>[
-                ListTile(
+                Motion.entrance(
+                  context,
+                  ListTile(
                   leading: const Icon(Icons.dark_mode_outlined),
                   title: const Text('تم'),
                   subtitle: const Text('تاریک بهعنوان پیشفرض'),
@@ -60,7 +63,12 @@ class SettingsPage extends ConsumerWidget {
                     ],
                   ),
                 ),
-                ListTile(
+                  0,
+                  id: 'settings',
+                ),
+                Motion.entrance(
+                  context,
+                  ListTile(
                   leading: const Icon(Icons.savings_outlined),
                   title: const Text('بودجه ماهانه'),
                   subtitle: Text(
@@ -70,7 +78,12 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   onTap: () => _editBudget(context, repo, settings),
                 ),
-                ListTile(
+                  1,
+                  id: 'settings',
+                ),
+                Motion.entrance(
+                  context,
+                  ListTile(
                   leading: const Icon(Icons.notifications_none_rounded),
                   title: const Text('یادآور شبانه'),
                   subtitle: Text(
@@ -78,7 +91,12 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   onTap: () => _editReminder(context, repo, settings),
                 ),
-                SwitchListTile(
+                  2,
+                  id: 'settings',
+                ),
+                Motion.entrance(
+                  context,
+                  SwitchListTile(
                   secondary: const Icon(Icons.fingerprint_outlined),
                   title: const Text('قفل بیومتریک'),
                   subtitle: const Text('اختیاری و خاموش پیشفرض'),
@@ -90,7 +108,12 @@ class SettingsPage extends ConsumerWidget {
                     );
                   },
                 ),
-                ListTile(
+                  3,
+                  id: 'settings',
+                ),
+                Motion.entrance(
+                  context,
+                  ListTile(
                   leading: const Icon(Icons.notifications_active_outlined),
                   title: const Text('مجوز اعلانها'),
                   subtitle: const Text('یادآور ژورنال و تمرکز'),
@@ -114,7 +137,12 @@ class SettingsPage extends ConsumerWidget {
                     }
                   },
                 ),
-                ListTile(
+                  4,
+                  id: 'settings',
+                ),
+                Motion.entrance(
+                  context,
+                  ListTile(
                   leading: const Icon(Icons.backup_outlined),
                   title: const Text('بکاپ و بازیابی'),
                   subtitle: const Text(
@@ -122,16 +150,29 @@ class SettingsPage extends ConsumerWidget {
                   ),
                   onTap: () => _backupSheet(context, ref),
                 ),
-                ListTile(
+                  5,
+                  id: 'settings',
+                ),
+                Motion.entrance(
+                  context,
+                  ListTile(
                   leading: const Icon(Icons.delete_forever_outlined),
                   title: const Text('ریست کامل'),
                   subtitle: const Text('تمام دادهها از دستگاه پاک میشوند'),
                   onTap: () => _resetData(context, ref),
                 ),
+                  6,
+                  id: 'settings',
+                ),
                 const Divider(),
-                const ListTile(
+                Motion.entrance(
+                  context,
+                  const ListTile(
                   title: Text('مدار'),
                   subtitle: Text('نسخه ۰.۱.۰ — Personal Life OS'),
+                ),
+                  7,
+                  id: 'settings',
                 ),
               ],
             );

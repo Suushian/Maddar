@@ -9,6 +9,7 @@ import 'package:madaar/core/utils/budget_calculator.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
 import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
 import 'package:madaar/core/widgets/finance_forms.dart';
@@ -50,15 +51,21 @@ class FinancePage extends ConsumerWidget {
               trailing: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: <Widget>[
-                  IconButton(
-                    tooltip: 'ثبت تراکنش',
-                    onPressed: () => _addTransaction(context, repoAsync),
-                    icon: const Icon(Icons.add_circle_outline_rounded),
+                  Motion.press(
+                    context,
+                    IconButton(
+                      tooltip: 'ثبت تراکنش',
+                      onPressed: () => _addTransaction(context, repoAsync),
+                      icon: const Icon(Icons.add_circle_outline_rounded),
+                    ),
                   ),
-                  IconButton(
-                    tooltip: 'تعریف قسط ثابت',
-                    onPressed: () => _addBill(context, repoAsync),
-                    icon: const Icon(Icons.receipt_long_outlined),
+                  Motion.press(
+                    context,
+                    IconButton(
+                      tooltip: 'تعریف قسط ثابت',
+                      onPressed: () => _addBill(context, repoAsync),
+                      icon: const Icon(Icons.receipt_long_outlined),
+                    ),
                   ),
                 ],
               ),
@@ -166,7 +173,9 @@ class FinancePage extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
       children: <Widget>[
-        Row(
+        Motion.entrance(
+          context,
+          Row(
           children: <Widget>[
             Expanded(
               child: BentoCard(
@@ -193,10 +202,15 @@ class FinancePage extends ConsumerWidget {
               ),
             ),
           ],
+          ),
+          0,
+          id: 'finance',
         ),
         const SizedBox(height: 12),
-        BentoCard(
-          child: Column(
+        Motion.entrance(
+          context,
+          BentoCard(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
@@ -224,10 +238,15 @@ class FinancePage extends ConsumerWidget {
                 ),
             ],
           ),
+          ),
+          1,
+          id: 'finance',
         ),
         const SizedBox(height: 12),
-        BentoCard(
-          child: Column(
+        Motion.entrance(
+          context,
+          BentoCard(
+            child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
@@ -262,6 +281,9 @@ class FinancePage extends ConsumerWidget {
             ],
           ),
         ),
+          2,
+          id: 'finance',
+        ),
         const SizedBox(height: 12),
         if (bills.isNotEmpty)
           BentoCard(
@@ -274,7 +296,9 @@ class FinancePage extends ConsumerWidget {
                 ),
                 const SizedBox(height: 8),
                 for (final BillModel bill in bills)
-                  ListTile(
+                  Motion.entrance(
+                    context,
+                    ListTile(
                     contentPadding: EdgeInsets.zero,
                     title: Text(bill.title),
                     subtitle: Text(
@@ -284,13 +308,19 @@ class FinancePage extends ConsumerWidget {
                     trailing: bill.lastPaidJalaliMonth == month
                         ? const Icon(Icons.check_circle_rounded,
                             color: AppColors.stone)
-                        : FilledButton.tonal(
-                            onPressed: () async {
-                              await Haptics.success();
-                              await repo.markBillPaid(bill.id, month);
-                            },
-                            child: const Text('پرداخت شد'),
+                        : Motion.press(
+                            context,
+                            FilledButton.tonal(
+                              onPressed: () async {
+                                await Haptics.success();
+                                await repo.markBillPaid(bill.id, month);
+                              },
+                              child: const Text('پرداخت شد'),
+                            ),
                           ),
+                    ),
+                    bills.indexOf(bill),
+                    id: 'bill-${bill.id}',
                   ),
               ],
             ),
@@ -307,7 +337,9 @@ class FinancePage extends ConsumerWidget {
               const SizedBox(height: 8),
               for (final TransactionModel tx
                   in transactions.take(8))
-                ListTile(
+                Motion.entrance(
+                  context,
+                  ListTile(
                   contentPadding: EdgeInsets.zero,
                   title: Text(tx.note ?? _categoryLabels[tx.categoryId] ??
                       tx.categoryId),
@@ -325,6 +357,9 @@ class FinancePage extends ConsumerWidget {
                           : AppColors.stone.withValues(alpha: 0.62),
                     ),
                   ),
+                  ),
+                  transactions.indexOf(tx),
+                  id: 'tx-${tx.id}',
                 ),
             ],
           ),
@@ -339,7 +374,11 @@ class FinancePage extends ConsumerWidget {
         children: <Widget>[
           Text(label, style: Theme.of(context).textTheme.bodySmall),
           const SizedBox(height: 8),
-          Text(value, style: Theme.of(context).textTheme.titleMedium),
+          Motion.swap(
+            context,
+            Text(value, style: Theme.of(context).textTheme.titleMedium),
+            'finance-stat-$value',
+          ),
         ],
       );
 

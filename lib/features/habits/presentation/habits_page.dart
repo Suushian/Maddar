@@ -5,6 +5,7 @@ import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
+import 'package:madaar/core/utils/motion.dart';
 import 'package:madaar/core/utils/streak_calculator.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
@@ -43,16 +44,22 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                   for (final int value in <int>[30, 90])
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 2),
-                      child: ChoiceChip(
-                        label: Text('$value روز'),
-                        selected: _days == value,
-                        onSelected: (_) => setState(() => _days = value),
+                      child: Motion.press(
+                        context,
+                        ChoiceChip(
+                          label: Text('$value روز'),
+                          selected: _days == value,
+                          onSelected: (_) => setState(() => _days = value),
+                        ),
                       ),
                     ),
-                  IconButton(
-                    tooltip: 'عادت جدید',
-                    onPressed: () => _openForm(repoAsync),
-                    icon: const Icon(Icons.add_rounded),
+                  Motion.press(
+                    context,
+                    IconButton(
+                      tooltip: 'عادت جدید',
+                      onPressed: () => _openForm(repoAsync),
+                      icon: const Icon(Icons.add_rounded),
+                    ),
                   ),
                 ],
               ),
@@ -94,14 +101,19 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                           itemCount: habits.length,
                           separatorBuilder: (_, __) => const SizedBox(height: 12),
                           itemBuilder: (BuildContext context, int index) =>
-                              _HabitCard(
-                            habit: habits[index],
-                            completedKeys: done,
-                            days: _days,
-                            onToggle: (String key) async {
-                              await Haptics.toggle();
-                              await repo.toggleLog(habits[index].id, key);
-                            },
+                              Motion.entrance(
+                            context,
+                            _HabitCard(
+                              habit: habits[index],
+                              completedKeys: done,
+                              days: _days,
+                              onToggle: (String key) async {
+                                await Haptics.toggle();
+                                await repo.toggleLog(habits[index].id, key);
+                              },
+                            ),
+                            index,
+                            id: 'habit-${habits[index].id}',
                           ),
                         );
                       },
@@ -179,7 +191,11 @@ class _HabitCard extends StatelessWidget {
         children: <Widget>[
           Row(
             children: <Widget>[
-              Icon(Icons.local_fire_department_rounded, color: color),
+              Motion.pulse(
+                context,
+                Icon(Icons.local_fire_department_rounded, color: color),
+                id: 'habit-fire-${habit.id}',
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -187,13 +203,23 @@ class _HabitCard extends StatelessWidget {
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
               ),
-              Text('🔥 $current', style: Theme.of(context).textTheme.bodyMedium),
+              Motion.number(
+                context,
+                current,
+                (num value) => '🔥 ${value.round()}',
+                style: Theme.of(context).textTheme.bodyMedium,
+                id: 'habit-streak-${habit.id}',
+              ),
             ],
           ),
           const SizedBox(height: 8),
-          Text(
-            'بهترین: $best  ·  موفقیت ماه: $rate٪',
+          Motion.number(
+            context,
+            best,
+            (num value) =>
+                'بهترین: ${value.round()}  ·  موفقیت ماه: $rate٪',
             style: Theme.of(context).textTheme.bodySmall,
+            id: 'habit-best-${habit.id}',
           ),
           const SizedBox(height: 12),
           HabitHeatmap(

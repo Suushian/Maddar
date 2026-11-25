@@ -64,70 +64,100 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
             children: <Widget>[
               Align(
                 alignment: Alignment.centerLeft,
-                child: TextButton(
-                  onPressed: () => unawaited(_finish(saveValues: false)),
-                  child: const Text('رد کردن'),
+                child: Motion.press(
+                  context,
+                  TextButton(
+                    onPressed: () => unawaited(_finish(saveValues: false)),
+                    child: const Text('رد کردن'),
+                  ),
                 ),
               ),
               const SizedBox(height: 24),
               Motion.entrance(
                 context,
-                Icon(Icons.auto_awesome_rounded, size: 56, color: brand),
+                Motion.pulse(
+                  context,
+                  Icon(Icons.auto_awesome_rounded, size: 56, color: brand),
+                  id: 'onboarding-mark',
+                ),
                 0,
               ),
               const SizedBox(height: 20),
-              Text(
-                _titles[_step],
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
+              Motion.swap(
+                context,
+                Text(
+                  _titles[_step],
+                  style: Theme.of(context).textTheme.headlineMedium,
+                  textAlign: TextAlign.center,
+                ),
+                'onboarding-title-$_step',
               ),
               const SizedBox(height: 10),
-              Text(
-                _descriptions[_step],
-                style: Theme.of(context).textTheme.bodyMedium,
-                textAlign: TextAlign.center,
+              Motion.swap(
+                context,
+                Text(
+                  _descriptions[_step],
+                  style: Theme.of(context).textTheme.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                'onboarding-desc-$_step',
               ),
               const SizedBox(height: 32),
               Expanded(
-                child: AnimatedSwitcher(
-                  duration: Motion.reduced(context)
-                      ? Duration.zero
-                      : const Duration(milliseconds: 220),
-                  child: _stepContent(context),
+                child: Motion.swap(
+                  context,
+                  _stepContent(context),
+                  'onboarding-step-$_step',
                 ),
               ),
               Row(
                 children: <Widget>[
                   for (int i = 0; i < 3; i++)
                     Expanded(
-                      child: Container(
-                        height: 5,
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        decoration: BoxDecoration(
-                          color: i <= _step ? brand : AppColors.borderSubtle(context),
-                          borderRadius: BorderRadius.circular(4),
+                      child: AnimatedScale(
+                        scale: i == _step ? 1.12 : 1,
+                        duration: Motion.fast,
+                        curve: Curves.easeOutCubic,
+                        child: AnimatedContainer(
+                          duration: Motion.fast,
+                          curve: Curves.easeOutCubic,
+                          height: 5,
+                          margin: const EdgeInsets.symmetric(horizontal: 3),
+                          decoration: BoxDecoration(
+                            color: i <= _step
+                                ? brand
+                                : AppColors.borderSubtle(context),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
                         ),
                       ),
                     ),
                 ],
               ),
               const SizedBox(height: 24),
-              FilledButton(
-                style: FilledButton.styleFrom(
-                  minimumSize: const Size.fromHeight(54),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+              Motion.press(
+                context,
+                FilledButton(
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size.fromHeight(54),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  onPressed: () {
+                    if (_step < 2) {
+                      Haptics.tap();
+                      setState(() => _step += 1);
+                    } else {
+                      unawaited(_finish(saveValues: true));
+                    }
+                  },
+                  child: Motion.swap(
+                    context,
+                    Text(_step == 2 ? 'ورود به مدار' : 'ادامه'),
+                    'onboarding-cta-$_step',
                   ),
                 ),
-                onPressed: () {
-                  if (_step < 2) {
-                    Haptics.tap();
-                    setState(() => _step += 1);
-                  } else {
-                    unawaited(_finish(saveValues: true));
-                  }
-                },
-                child: Text(_step == 2 ? 'ورود به مدار' : 'ادامه'),
               ),
             ],
           ),
@@ -138,53 +168,46 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   Widget _stepContent(BuildContext context) {
     if (_step == 0) {
-      return Motion.entrance(
-        context,
-        TextField(
-          key: const ValueKey<int>(0),
-          controller: _name,
-          autofocus: true,
-          textAlign: TextAlign.center,
-          decoration: const InputDecoration(
-            hintText: 'نام تو',
-            border: OutlineInputBorder(),
-          ),
+      return TextField(
+        key: const ValueKey<int>(0),
+        controller: _name,
+        autofocus: true,
+        textAlign: TextAlign.center,
+        decoration: const InputDecoration(
+          hintText: 'نام تو',
+          border: OutlineInputBorder(),
         ),
-        0,
       );
     }
     if (_step == 1) {
-      return Motion.entrance(
-        context,
-        TextField(
-          key: const ValueKey<int>(1),
-          controller: _budget,
-          autofocus: true,
-          keyboardType: TextInputType.number,
-          textAlign: TextAlign.center,
-          decoration: const InputDecoration(
-            hintText: 'مثلاً ۲,۰۰۰,۰۰۰ تومان',
-            border: OutlineInputBorder(),
-          ),
+      return TextField(
+        key: const ValueKey<int>(1),
+        controller: _budget,
+        autofocus: true,
+        keyboardType: TextInputType.number,
+        textAlign: TextAlign.center,
+        decoration: const InputDecoration(
+          hintText: 'مثلاً ۲,۰۰۰,۰۰۰ تومان',
+          border: OutlineInputBorder(),
         ),
-        0,
       );
     }
-    return Motion.entrance(
-      context,
-      SingleChildScrollView(
-        key: const ValueKey<int>(2),
-        child: Column(
+    return SingleChildScrollView(
+      key: const ValueKey<int>(2),
+      child: Column(
           children: <Widget>[
             Wrap(
               alignment: WrapAlignment.center,
               spacing: 10,
               children: <Widget>[
                 for (final ThemeMode mode in ThemeMode.values)
-                  ChoiceChip(
-                    label: Text(_themeLabel(mode)),
-                    selected: _theme == mode,
-                    onSelected: (_) => setState(() => _theme = mode),
+                  Motion.press(
+                    context,
+                    ChoiceChip(
+                      label: Text(_themeLabel(mode)),
+                      selected: _theme == mode,
+                      onSelected: (_) => setState(() => _theme = mode),
+                    ),
                   ),
               ],
             ),
@@ -204,9 +227,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               textAlign: TextAlign.center,
             ),
           ],
-        ),
       ),
-      0,
     );
   }
 

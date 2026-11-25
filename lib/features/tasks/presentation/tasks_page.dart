@@ -6,6 +6,7 @@ import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/empty_state_view.dart';
 import 'package:madaar/core/widgets/module_header.dart';
@@ -56,13 +57,17 @@ class _TasksPageState extends ConsumerState<TasksPage> {
                     Expanded(
                       child: Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 3),
-                        child: ChoiceChip(
-                          label: Text(_tabs[i]),
-                          selected: _tab == i,
-                          onSelected: (_) => setState(() => _tab = i),
-                          side:
-                              BorderSide(color: AppColors.borderSubtle(context)),
-                          selectedColor: accent.withValues(alpha: 0.18),
+                        child: Motion.press(
+                          context,
+                          ChoiceChip(
+                            label: Text(_tabs[i]),
+                            selected: _tab == i,
+                            onSelected: (_) => setState(() => _tab = i),
+                            side: BorderSide(
+                              color: AppColors.borderSubtle(context),
+                            ),
+                            selectedColor: accent.withValues(alpha: 0.18),
+                          ),
                         ),
                       ),
                     ),
@@ -98,11 +103,17 @@ class _TasksPageState extends ConsumerState<TasksPage> {
                       padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
                       itemCount: tasks.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 8),
-                      itemBuilder: (BuildContext context, int index) => _TaskTile(
-                        task: tasks[index],
-                        repo: repo,
-                        accent: accent,
-                      ),
+                      itemBuilder: (BuildContext context, int index) =>
+                          Motion.entrance(
+                            context,
+                            _TaskTile(
+                              task: tasks[index],
+                              repo: repo,
+                              accent: accent,
+                            ),
+                            index,
+                            id: 'task-${tasks[index].id}',
+                          ),
                     );
                   },
                 ),
@@ -198,10 +209,12 @@ class _TaskTile extends StatelessWidget {
         ),
         child: Row(
           children: <Widget>[
-            GestureDetector(
-              onTap: () => repo.toggleCompleted(task.id),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 180),
+            Motion.press(
+              context,
+              GestureDetector(
+                onTap: () => repo.toggleCompleted(task.id),
+                child: AnimatedContainer(
+                  duration: Motion.fast,
                 width: 26,
                 height: 26,
                 decoration: BoxDecoration(
@@ -212,9 +225,15 @@ class _TaskTile extends StatelessWidget {
                     width: 2,
                   ),
                 ),
-                child: task.isCompleted
-                    ? const Icon(Icons.check, size: 16, color: AppColors.paper)
-                    : null,
+                  child: task.isCompleted
+                      ? Motion.pulse(
+                          context,
+                          const Icon(Icons.check,
+                              size: 16, color: AppColors.paper),
+                          id: 'task-check',
+                        )
+                      : null,
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -242,17 +261,22 @@ class _TaskTile extends StatelessWidget {
                 ],
               ),
             ),
-            IconButton(
-              tooltip: 'حذف کار',
-              onPressed: () => _confirmDelete(context, repo, task),
-              icon: Icon(
-                Icons.delete_outline_rounded,
-                color: AppColors.textMuted(context),
-                size: 20,
+            Motion.press(
+              context,
+              IconButton(
+                tooltip: 'حذف کار',
+                onPressed: () => _confirmDelete(context, repo, task),
+                icon: Icon(
+                  Icons.delete_outline_rounded,
+                  color: AppColors.textMuted(context),
+                  size: 20,
+                ),
               ),
             ),
-            IconButton(
-              tooltip: task.isTopFocus ? 'حذف از تمرکز' : 'تمرکز امروز',
+            Motion.press(
+              context,
+              IconButton(
+                tooltip: task.isTopFocus ? 'حذف از تمرکز' : 'تمرکز امروز',
               onPressed: () async {
                 await Haptics.tap();
                 if (task.isTopFocus) {
@@ -276,6 +300,7 @@ class _TaskTile extends StatelessWidget {
                     ? Icons.auto_awesome_rounded
                     : Icons.auto_awesome_outlined,
                 color: task.isTopFocus ? accent : AppColors.textMuted(context),
+              ),
               ),
             ),
           ],

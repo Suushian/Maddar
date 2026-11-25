@@ -3,6 +3,7 @@ import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 /// ماتریس پیوستگی ۳۰/۹۰ روزه با مربعهای گرد 6px و طیف رنگ عادت.
 class HabitHeatmap extends StatelessWidget {
@@ -83,18 +84,24 @@ class _DayCell extends StatelessWidget {
     return Tooltip(
       message: '${JalaliHelper.shortDate(date)} — '
           '${done ? 'انجام شد' : 'انجام نشد'}',
-      child: InkWell(
-        onTap: () async {
-          await Haptics.toggle();
-          onTap(key);
-        },
-        borderRadius: BorderRadius.circular(6),
-        child: Container(
-          decoration: BoxDecoration(
-            color: done ? color : AppColors.borderSubtle(context),
-            borderRadius: BorderRadius.circular(6),
+      child: Motion.press(
+        context,
+        InkWell(
+          onTap: () async {
+            await Haptics.toggle();
+            onTap(key);
+          },
+          borderRadius: BorderRadius.circular(6),
+          child: AnimatedContainer(
+            duration: Motion.micro,
+            curve: Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              color: done ? color : AppColors.borderSubtle(context),
+              borderRadius: BorderRadius.circular(6),
+            ),
           ),
         ),
+        minScale: 0.82,
       ),
     );
   }

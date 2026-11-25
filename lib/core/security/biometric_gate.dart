@@ -6,6 +6,7 @@ import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 /// قفل بیومتریک اختیاری؛ پیشفرض خاموش است و هیچ ثبتی را مسدود نمیکند.
 class BiometricGate extends ConsumerStatefulWidget {
@@ -83,9 +84,17 @@ class _BiometricGateState extends ConsumerState<BiometricGate>
           final bool enabled =
               snapshot.data?.biometricLockEnabled ?? false;
           if (!enabled || _unlocked) {
-            return widget.child;
+            return Motion.swap(
+              context,
+              widget.child,
+              'gate-open-$enabled-$_unlocked',
+            );
           }
-          return _LockScreen(error: _error, onUnlock: _authenticate);
+          return Motion.swap(
+            context,
+            _LockScreen(error: _error, onUnlock: _authenticate),
+            'gate-locked',
+          );
         },
       ),
       loading: () => widget.child,
@@ -121,16 +130,30 @@ class _LockScreenState extends State<_LockScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Icon(Icons.fingerprint_rounded, size: 72, color: brand),
+              Motion.pulse(
+                context,
+                Icon(Icons.fingerprint_rounded, size: 72, color: brand),
+                id: 'lock-mark',
+              ),
               const SizedBox(height: 20),
-              Text(
-                'مدار قفل است',
-                style: Theme.of(context).textTheme.headlineSmall,
+              Motion.entrance(
+                context,
+                Text(
+                  'مدار قفل است',
+                  style: Theme.of(context).textTheme.headlineSmall,
+                ),
+                0,
+                id: 'lock',
               ),
               const SizedBox(height: 8),
-              const Text(
-                'برای دسترسی به دادههای روی دستگاه، هویت خود را تأیید کنید.',
-                textAlign: TextAlign.center,
+              Motion.entrance(
+                context,
+                const Text(
+                  'برای دسترسی به دادههای روی دستگاه، هویت خود را تأیید کنید.',
+                  textAlign: TextAlign.center,
+                ),
+                1,
+                id: 'lock',
               ),
               if (widget.error != null) ...<Widget>[
                 const SizedBox(height: 12),
@@ -141,10 +164,13 @@ class _LockScreenState extends State<_LockScreen> {
                 ),
               ],
               const SizedBox(height: 24),
-              FilledButton.icon(
-                onPressed: widget.onUnlock,
-                icon: const Icon(Icons.fingerprint_rounded),
-                label: const Text('تأیید هویت'),
+              Motion.press(
+                context,
+                FilledButton.icon(
+                  onPressed: widget.onUnlock,
+                  icon: const Icon(Icons.fingerprint_rounded),
+                  label: const Text('تأیید هویت'),
+                ),
               ),
             ],
           ),

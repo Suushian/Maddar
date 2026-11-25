@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/theme/app_typography.dart';
+import 'package:madaar/core/utils/motion.dart';
 
-/// انتقال نرم صفحهها: fade ساده ۱۸۰ms بدون حرکت اضافه.
+/// انتقال نرم صفحهها: محو + سر خوردن کوتاه وابسته به جهت RTL + کمی بزرگ شدن.
 class MadaarPageTransition extends PageTransitionsBuilder {
   MadaarPageTransition();
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 180);
+  Duration get transitionDuration => Motion.base;
 
   @override
   Widget buildTransitions<T>(
@@ -17,12 +18,30 @@ class MadaarPageTransition extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
+    if (context == null || Motion.reduced(context)) {
+      return child;
+    }
+    final bool rtl = Directionality.maybeOf(context) == TextDirection.rtl;
     final Animation<double> curved = CurvedAnimation(
       parent: animation,
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
     );
-    return FadeTransition(opacity: curved, child: child);
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(
+        position: curved.drive(
+          Tween<Offset>(
+            begin: Offset(rtl ? 0.035 : -0.035, 0),
+            end: Offset.zero,
+          ),
+        ),
+        child: ScaleTransition(
+          scale: curved.drive(Tween<double>(begin: 0.985, end: 1)),
+          child: child,
+        ),
+      ),
+    );
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 /// فرم تعریف عادت با سه الگوی تکرار مطابق ADR-005.
 class HabitFormSheet extends StatefulWidget {
@@ -116,11 +117,13 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
               spacing: 8,
               children: <Widget>[
                 for (int i = 0; i < _repeatLabels.length; i++)
-                  ChoiceChip(
+                  Motion.press(
+                    context,
+                    ChoiceChip(
                     label: Text(_repeatLabels[i]),
                     selected: _repeatType == _repeatValues[i],
                     onSelected: (_) => setState(() => _repeatType = _repeatValues[i]),
-                  ),
+                  )),
               ],
             ),
             if (_repeatType == 'weekly') ...<Widget>[
@@ -129,13 +132,15 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
                 spacing: 6,
                 children: <Widget>[
                   for (int i = 0; i < 7; i++)
-                    FilterChip(
+                    Motion.press(
+                      context,
+                      FilterChip(
                       label: Text(_weekdayLabels[i]),
                       selected: (_weekdayMask & (1 << i)) != 0,
                       onSelected: (_) => setState(
                         () => _weekdayMask ^= 1 << i,
                       ),
-                    ),
+                    )),
                 ],
               ),
             ],
@@ -168,7 +173,9 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
               spacing: 10,
               children: <Widget>[
                 for (final MapEntry<String, IconData> icon in _icons.entries)
-                  IconButton(
+                  Motion.press(
+                    context,
+                    IconButton(
                     tooltip: icon.key,
                     onPressed: () => setState(() => _iconCode = icon.key),
                     icon: Icon(
@@ -177,11 +184,13 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
                           ? _colors[_colorIndex]
                           : AppColors.textMuted(context),
                     ),
-                  ),
+                  )),
               ],
             ),
             const SizedBox(height: 24),
-            FilledButton(
+            Motion.press(
+              context,
+              FilledButton(
               onPressed: () async {
                 final String title = _title.text.trim();
                 if (title.isEmpty) {
@@ -204,7 +213,7 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
                 }
               },
               child: const Text('ذخیره عادت'),
-            ),
+            )),
           ],
         ),
       ),

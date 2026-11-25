@@ -8,8 +8,9 @@ import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
 import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
 
-/// شیت چهارتبه ثبت سریع؛ทุก تب مستقیماً به Repository مربوطه متصل است.
+/// شیت چهارتبه ثبت سریع؛ هر تب مستقیماً به Repository مربوطه متصل است.
 class UniversalQuickAdd extends StatefulWidget {
   const UniversalQuickAdd({super.key, this.initialTab = 0});
 
@@ -162,11 +163,22 @@ abstract final class _QuickFormStyle {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: <Widget>[
-                  Text(title, style: Theme.of(context).textTheme.titleMedium),
+                  Motion.entrance(
+                    context,
+                    Text(title, style: Theme.of(context).textTheme.titleMedium),
+                    0,
+                    id: 'quick-form',
+                  ),
                   const SizedBox(height: 12),
-                  ...fields,
+                  for (int index = 0; index < fields.length; index++)
+                    Motion.entrance(
+                      context,
+                      fields[index],
+                      index + 1,
+                      id: 'quick-form-field',
+                    ),
                   const SizedBox(height: 16),
-                  FilledButton(
+                  Motion.press(context, FilledButton(
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(52),
                       shape: RoundedRectangleBorder(
@@ -186,7 +198,7 @@ abstract final class _QuickFormStyle {
                       }
                     },
                     child: Text(actionLabel),
-                  ),
+                  )),
                 ],
               ),
             ),
@@ -259,19 +271,25 @@ class _TaskQuickFormState extends ConsumerState<_TaskQuickForm> {
               spacing: 8,
               children: <Widget>[
                 for (final MapEntry<String, String> entry in _pillars.entries)
-                  ChoiceChip(
-                    label: Text(entry.value),
-                    selected: _pillar == entry.key,
-                    onSelected: (_) => setState(() => _pillar = entry.key),
+                  Motion.press(
+                    context,
+                    ChoiceChip(
+                      label: Text(entry.value),
+                      selected: _pillar == entry.key,
+                      onSelected: (_) => setState(() => _pillar = entry.key),
+                    ),
                   ),
               ],
             ),
             const SizedBox(height: 8),
-            FilterChip(
-              label: const Text('مهم'),
-              selected: _priority == 1,
-              onSelected: (bool selected) =>
-                  setState(() => _priority = selected ? 1 : 0),
+            Motion.press(
+              context,
+              FilterChip(
+                label: const Text('مهم'),
+                selected: _priority == 1,
+                onSelected: (bool selected) =>
+                    setState(() => _priority = selected ? 1 : 0),
+              ),
             ),
             SwitchListTile(
               contentPadding: EdgeInsets.zero,
@@ -348,10 +366,13 @@ class _TransactionQuickFormState extends ConsumerState<_TransactionQuickForm> {
               children: <Widget>[
                 for (final MapEntry<String, String> entry
                     in _categories.entries)
-                  ChoiceChip(
-                    label: Text(entry.value),
-                    selected: _category == entry.key,
-                    onSelected: (_) => setState(() => _category = entry.key),
+                  Motion.press(
+                    context,
+                    ChoiceChip(
+                      label: Text(entry.value),
+                      selected: _category == entry.key,
+                      onSelected: (_) => setState(() => _category = entry.key),
+                    ),
                   ),
               ],
             ),
@@ -476,10 +497,13 @@ class _HabitQuickFormState extends ConsumerState<_HabitQuickForm> {
               spacing: 8,
               children: <Widget>[
                 for (final MapEntry<String, String> entry in _repeats.entries)
-                  ChoiceChip(
-                    label: Text(entry.value),
-                    selected: _repeat == entry.key,
-                    onSelected: (_) => setState(() => _repeat = entry.key),
+                  Motion.press(
+                    context,
+                    ChoiceChip(
+                      label: Text(entry.value),
+                      selected: _repeat == entry.key,
+                      onSelected: (_) => setState(() => _repeat = entry.key),
+                    ),
                   ),
               ],
             ),

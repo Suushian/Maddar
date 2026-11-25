@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 /// فرم سریع تراکنش و قسط ثابت (روی یک قلم).
 class FinanceEntrySheet extends StatefulWidget {
@@ -188,7 +189,9 @@ class _FinanceEntrySheetState extends State<FinanceEntrySheet> {
               },
             ),
             const SizedBox(height: 16),
-            FilledButton(
+            Motion.press(
+              context,
+              FilledButton(
               onPressed: () async {
                 final int amount = CurrencyFormatter.parse(_amount.text);
                 final String title = _title.text.trim();
@@ -207,7 +210,7 @@ class _FinanceEntrySheetState extends State<FinanceEntrySheet> {
                 }
               },
               child: const Text('ذخیره'),
-            ),
+            )),
           ],
         ),
       ),

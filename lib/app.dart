@@ -8,6 +8,7 @@ import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/notifications/notification_providers.dart';
 import 'package:madaar/core/router/app_router.dart';
+import 'package:madaar/core/utils/motion.dart';
 import 'package:madaar/core/security/biometric_gate.dart';
 import 'package:madaar/core/state/app_providers.dart';
 import 'package:madaar/core/theme/app_theme.dart';
@@ -116,9 +117,13 @@ class _OnboardingGate extends ConsumerWidget {
         ) {
           final SettingsModel? settings = snapshot.data;
           if (settings == null || settings.onboardingCompleted) {
-            return child;
+            return Motion.swap(context, child, 'app-ready');
           }
-          return OnboardingPage(settings: settings, repository: repo);
+          return Motion.swap(
+            context,
+            OnboardingPage(settings: settings, repository: repo),
+            'app-onboarding',
+          );
         },
       ),
       loading: () => child,
