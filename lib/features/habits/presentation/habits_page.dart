@@ -4,6 +4,7 @@ import 'package:madaar/core/database/database_providers.dart';
 import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
+import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/streak_calculator.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
@@ -97,8 +98,10 @@ class _HabitsPageState extends ConsumerState<HabitsPage> {
                             habit: habits[index],
                             completedKeys: done,
                             days: _days,
-                            onToggle: (String key) =>
-                                repo.toggleLog(habits[index].id, key),
+                            onToggle: (String key) async {
+                              await Haptics.toggle();
+                              await repo.toggleLog(habits[index].id, key);
+                            },
                           ),
                         );
                       },

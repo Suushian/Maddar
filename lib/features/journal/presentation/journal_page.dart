@@ -7,6 +7,7 @@ import 'package:madaar/core/database/database_providers.dart';
 import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
+import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
@@ -153,6 +154,7 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                                 alignment: Alignment.centerLeft,
                                 child: FilledButton(
                                   onPressed: () async {
+                                    await Haptics.success();
                                     await repo.upsert(
                                       dateKey: today,
                                       moodScore: _mood,

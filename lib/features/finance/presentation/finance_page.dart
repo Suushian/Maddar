@@ -7,6 +7,7 @@ import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/budget_calculator.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
+import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
@@ -294,8 +295,10 @@ class FinancePage extends ConsumerWidget {
                         ? const Icon(Icons.check_circle_rounded,
                             color: Colors.green)
                         : FilledButton.tonal(
-                            onPressed: () =>
-                                repo.markBillPaid(bill.id, month),
+                            onPressed: () async {
+                              await Haptics.success();
+                              await repo.markBillPaid(bill.id, month);
+                            },
                             child: const Text('پرداخت شد'),
                           ),
                   ),
@@ -407,14 +410,16 @@ class FinancePage extends ConsumerWidget {
         required String categoryId,
         required DateTime transactedAt,
         required String type,
-      }) =>
-          repo.addTransaction(
-        amount: amount,
-        type: type,
-        categoryId: categoryId,
-        note: note,
-        transactedAt: transactedAt,
-      ),
+      }) async {
+        await Haptics.success();
+        await repo.addTransaction(
+          amount: amount,
+          type: type,
+          categoryId: categoryId,
+          note: note,
+          transactedAt: transactedAt,
+        );
+      },
     );
   }
 
@@ -461,6 +466,7 @@ class FinancePage extends ConsumerWidget {
               if (value == null || dueDay == null || title.text.trim().isEmpty) {
                 return;
               }
+              await Haptics.success();
               await repo.addBill(
                 title: title.text.trim(),
                 amount: value,

@@ -5,7 +5,11 @@ import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
+import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
+import 'package:madaar/core/utils/repeat_rule_matcher.dart';
+import 'package:madaar/core/utils/streak_calculator.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
 import 'package:madaar/core/widgets/module_header.dart';
@@ -45,7 +49,7 @@ class TodayPage extends ConsumerWidget {
               ),
             ),
             SliverToBoxAdapter(
-              child: Padding(
+              child: Motion.entrance(context, Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: <Widget>[
@@ -71,11 +75,11 @@ class TodayPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-              ),
+              ), 0),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 20)),
             SliverToBoxAdapter(
-              child: Padding(
+              child: Motion.entrance(context, Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: BentoCard(
                   accent: tasksColor,
@@ -104,10 +108,10 @@ class TodayPage extends ConsumerWidget {
                     ],
                   ),
                 ),
-              ),
+              ), 1),
             ),
             SliverToBoxAdapter(
-              child: Padding(
+              child: Motion.entrance(context, Padding(
                 padding: const EdgeInsets.fromLTRB(20, 8, 20, 0),
                 child: AsyncRepoView<TasksRepository>(
                   value: ref.watch(tasksRepositoryProvider),
@@ -129,8 +133,10 @@ class TodayPage extends ConsumerWidget {
                             CheckboxListTile(
                               contentPadding: EdgeInsets.zero,
                               value: task.isCompleted,
-                              onChanged: (_) =>
-                                  repo.toggleCompleted(task.id),
+                              onChanged: (_) async {
+                                await Haptics.toggle();
+                                await repo.toggleCompleted(task.id);
+                              },
                               title: Text(
                                 task.title,
                                 style: TextStyle(
@@ -145,11 +151,11 @@ class TodayPage extends ConsumerWidget {
                     },
                   ),
                 ),
-              ),
+              ), 2),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
-              child: Padding(
+              child: Motion.entrance(context, Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: BentoCard(
                   accent: habitsColor,
@@ -179,11 +185,20 @@ class TodayPage extends ConsumerWidget {
                     ],
                   ),
                 ),
+              ), 3),
+            ),
+            SliverToBoxAdapter(
+              child: AsyncRepoView<HabitsRepository>(
+                value: ref.watch(habitsRepositoryProvider),
+                builder: (HabitsRepository repo) => _HabitStrip(
+                  repo: repo,
+                  now: now,
+                ),
               ),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 12)),
             SliverToBoxAdapter(
-              child: Padding(
+              child: Motion.entrance(context, Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(
                   children: <Widget>[
@@ -240,12 +255,93 @@ class TodayPage extends ConsumerWidget {
                     ),
                   ],
                 ),
-              ),
+              ), 4),
             ),
             const SliverToBoxAdapter(child: SizedBox(height: 28)),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _HabitStrip extends StatelessWidget {
+  const _HabitStrip({required this.repo, required this.now});
+
+  final HabitsRepository repo;
+  final DateTime now;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<HabitModel>>(
+      stream: repo.watchAll(),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<List<HabitModel>> habitSnapshot,
+      ) {
+        final List<HabitModel> habits = (habitSnapshot.data ?? const <HabitModel>[])
+            .where((habit) => RepeatRuleMatcher.isEligible(habit, now))
+            .toList();
+        if (habits.isEmpty) {
+          return const SizedBox.shrink();
+        }
+        return StreamBuilder<List<HabitLogModel>>(
+          stream: repo.watchLogs(),
+          builder: (
+            BuildContext context,
+            AsyncSnapshot<List<HabitLogModel>> logSnapshot,
+          ) {
+            final Map<int, Set<String>> done = <int, Set<String>>{};
+            for (final HabitLogModel log
+                in logSnapshot.data ?? const <HabitLogModel>[]) {
+              done.putIfAbsent(log.habitId, () => <String>{}).add(log.dateKey);
+            }
+            final String today = JalaliHelper.dateKey(now);
+            return SizedBox(
+              height: 68,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                reverse: true,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                separatorBuilder: (_, __) => const SizedBox(width: 10),
+                itemCount: habits.length,
+                itemBuilder: (BuildContext context, int index) {
+                  final HabitModel habit = habits[index];
+                  final Set<String> habitDays =
+                      done[habit.id] ?? const <String>{};
+                  final bool checked = habitDays.contains(today);
+                  final int streak = StreakCalculator.current(
+                    habit: habit,
+                    completedDateKeys: habitDays,
+                    today: now,
+                  );
+                  return Motion.spring(
+                    context,
+                    ActionChip(
+                      avatar: Icon(
+                        checked
+                            ? Icons.check_circle_rounded
+                            : Icons.radio_button_unchecked_rounded,
+                        size: 18,
+                        color: checked
+                            ? AppColors.habits
+                            : AppColors.textMuted(context),
+                      ),
+                      label: Text(
+                        '${habit.title}  🔥${JalaliHelper.faDigits(streak)}',
+                      ),
+                      onPressed: () async {
+                        await Haptics.toggle();
+                        await repo.toggleLog(habit.id, today);
+                      },
+                    ),
+                  );
+                },
+              ),
+            );
+          },
+        );
+      },
     );
   }
 }
