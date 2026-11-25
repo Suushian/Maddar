@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:madaar/core/database/app_database.dart';
 import 'package:madaar/core/database/backup_service.dart';
 import 'package:madaar/core/database/database_providers.dart';
 import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
+import 'package:madaar/core/notifications/notification_providers.dart';
 import 'package:madaar/core/state/app_providers.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
+import 'package:madaar/core/utils/haptics.dart';
 
 class SettingsPage extends ConsumerWidget {
   const SettingsPage({super.key});
@@ -81,9 +84,34 @@ class SettingsPage extends ConsumerWidget {
                   subtitle: const Text('اختیاری و خاموش پیشفرض'),
                   value: settings.biometricLockEnabled,
                   onChanged: (bool value) async {
+                    await Haptics.toggle();
                     await repo.update(
                       settings.copyWith(biometricLockEnabled: value),
                     );
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.notifications_active_outlined),
+                  title: const Text('مجوز اعلانها'),
+                  subtitle: const Text('یادآور ژورنال و تمرکز'),
+                  onTap: () async {
+                    final bool granted = await ref
+                        .read(notificationServiceProvider)
+                        .requestPermission();
+                    if (granted) {
+                      await ref
+                          .read(notificationServiceProvider)
+                          .syncSchedule(settings);
+                    }
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            granted ? 'اعلانها روشن شدند' : 'مجوز اعلان داده نشد',
+                          ),
+                        ),
+                      );
+                    }
                   },
                 ),
                 ListTile(
@@ -93,6 +121,12 @@ class SettingsPage extends ConsumerWidget {
                     'خروجی JSON نسخهدار — کپی و جایگذاری',
                   ),
                   onTap: () => _backupSheet(context, ref),
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete_forever_outlined),
+                  title: const Text('ریست کامل'),
+                  subtitle: const Text('تمام دادهها از دستگاه پاک میشوند'),
+                  onTap: () => _resetData(context, ref),
                 ),
                 const Divider(),
                 const ListTile(
@@ -192,6 +226,59 @@ class SettingsPage extends ConsumerWidget {
       ),
     );
     controller.dispose();
+  }
+
+  Future<void> _resetData(BuildContext context, WidgetRef ref) async {
+    final bool? first = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('ریست کامل؟'),
+        content: const Text(
+          'تمام کارها، عادتها، تراکنشها و یادداشتها پاک میشوند. توصیه میشود ابتدا بکاپ بگیرید.',
+        ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('لغو'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('ادامه'),
+          ),
+        ],
+      ),
+    );
+    if (first != true) {
+      return;
+    }
+    final bool? second = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        title: const Text('تأیید نهایی'),
+        content: const Text('این عمل قابل بازگشت نیست. ادامه میدهید؟'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('لغو'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('پاک کردن'),
+          ),
+        ],
+      ),
+    );
+    if (second != true) {
+      return;
+    }
+    final AppDatabase db = await ref.read(appDatabaseProvider.future);
+    await db.resetToDefaults();
+    await Haptics.warning();
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('دادهها پاک شدند')),
+      );
+    }
   }
 
   void _backupSheet(BuildContext context, WidgetRef ref) {

@@ -128,6 +128,17 @@ class AppDatabase extends GeneratedDatabase {
     }
   }
 
+  /// پاککردن کامل با حفظ ردیف تنظیمات پیشفرض (برای ریست تنظیمات).
+  Future<void> resetToDefaults() async {
+    await transaction(() async {
+      await clearAll();
+      await customStatement(
+        'INSERT INTO app_settings (id, theme_mode, updated_at) VALUES (1, ?, ?)',
+        <dynamic>['dark', nowIso()],
+      );
+    });
+  }
+
   static const List<String> _tableNames = <String>[
     'habit_logs',
     'tasks',
