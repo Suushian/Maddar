@@ -136,7 +136,7 @@ class _LockScreenState extends State<_LockScreen> {
                 const SizedBox(height: 12),
                 Text(
                   widget.error!,
-                  style: TextStyle(color: AppColors.expenseLight),
+                  style: TextStyle(color: AppColors.stone),
                   textAlign: TextAlign.center,
                 ),
               ],

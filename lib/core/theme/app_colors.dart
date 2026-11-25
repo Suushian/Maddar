@@ -1,71 +1,72 @@
 import 'package:flutter/material.dart';
 
-/// ماژولهایی که رنگ معناگرا دارند.
+/// ماژولهایی که پیشتر رنگ معناگرا داشتند؛ اکنون همگی از Stone خنثی پیروی میکنند.
+/// نگه داشتن enum تنها برای سازگاری API است، نه برای رنگ جداگانه.
 enum MadaarAccent { tasks, habits, income, expense, journal }
 
-/// توکنهای رنگی دو تم مدار. مقادیر از docs/03-DESIGN_SYSTEM.md میآیند.
+/// سه رنگ ثابت و خنثی مدار;ทุก شفافیتها از همین سه رنگ میآیند.
 abstract final class AppColors {
-  static const Color brandLight = Color(0xFF6366F1);
-  static const Color brandDark = Color(0xFF818CF8);
+  static const Color paper = Color(0xFFEFEDE8);
+  static const Color ink = Color(0xFF242521);
+  static const Color stone = Color(0xFF898D84);
 
-  static const Color tasks = Color(0xFF38BDF8);
-  static const Color habits = Color(0xFF10B981);
-  static const Color income = Color(0xFF22C55E);
-  static const Color expenseLight = Color(0xFFF59E0B);
-  static const Color expenseDark = Color(0xFFFB7185);
-  static const Color journal = Color(0xFFC084FC);
+  /// نامهای قدیمی توکنها برای سازگاری؛ همگی به Stone خنثی اشاره میکنند.
+  static const Color brandLight = stone;
+  static const Color brandDark = stone;
+  static const Color tasks = stone;
+  static const Color habits = stone;
+  static const Color income = stone;
+  static const Color expenseLight = stone;
+  static const Color expenseDark = stone;
+  static const Color journal = stone;
 
-  static const Color bgDark = Color(0xFF090B0E);
-  static const Color surfaceDark = Color(0xFF12151B);
-  static const Color elevatedDark = Color(0xFF1A1F28);
-  static const Color bgLight = Color(0xFFF6F5F1);
-  static const Color textDark = Color(0xFFF3F5F8);
-  static const Color textLight = Color(0xFF11151C);
-  static const Color secondaryDark = Color(0xFF949EAE);
-  static const Color secondaryLight = Color(0xFF525C6B);
-  static const Color mutedDark = Color(0xFF5B6472);
-  static const Color mutedLight = Color(0xFF8E98A8);
+  static const Color bgDark = ink;
+  static const Color bgLight = paper;
+  static const Color surfaceDark = ink;
+  static const Color elevatedDark = ink;
+  static const Color textDark = paper;
+  static const Color textLight = ink;
+
+  /// طیفهای خنثی برای نمودارها، Heatmap و برچسبها — بدون رنگ جدید.
+  static List<Color> get neutralTones => <Color>[
+        stone,
+        stone.withValues(alpha: 0.82),
+        stone.withValues(alpha: 0.64),
+        stone.withValues(alpha: 0.46),
+        stone.withValues(alpha: 0.30),
+        stone.withValues(alpha: 0.18),
+      ];
+
+  static Color tone(int index) =>
+      neutralTones[index % neutralTones.length];
 
   static bool isDark(BuildContext context) =>
       Theme.of(context).brightness == Brightness.dark;
 
   static Color bgPrimary(BuildContext context) =>
-      isDark(context) ? bgDark : bgLight;
+      isDark(context) ? ink : paper;
 
+  /// سطح کارتها: همان Stone با شفافیت کم، روی پسزمینه Paper/Ink.
   static Color bgSurface(BuildContext context) =>
-      isDark(context) ? surfaceDark : Colors.white;
+      stone.withValues(alpha: isDark(context) ? 0.11 : 0.07);
 
   static Color bgElevated(BuildContext context) =>
-      isDark(context) ? elevatedDark : Colors.white;
+      isDark(context)
+          ? stone.withValues(alpha: 0.16)
+          : paper.withValues(alpha: 0.96);
 
-  static Color borderSubtle(BuildContext context) => isDark(context)
-      ? Colors.white.withValues(alpha: 0.07)
-      : const Color(0xFF0F172A).withValues(alpha: 0.06);
+  static Color borderSubtle(BuildContext context) =>
+      stone.withValues(alpha: isDark(context) ? 0.24 : 0.22);
 
   static Color textPrimary(BuildContext context) =>
       Theme.of(context).colorScheme.onSurface;
 
-  static Color textSecondary(BuildContext context) =>
-      isDark(context) ? secondaryDark : secondaryLight;
+  static Color textSecondary(BuildContext context) => stone;
 
   static Color textMuted(BuildContext context) =>
-      isDark(context) ? mutedDark : mutedLight;
+      stone.withValues(alpha: 0.72);
 
-  static Color brand(BuildContext context) =>
-      isDark(context) ? brandDark : brandLight;
+  static Color brand(BuildContext context) => stone;
 
-  static Color accent(BuildContext context, MadaarAccent key) {
-    switch (key) {
-      case MadaarAccent.tasks:
-        return tasks;
-      case MadaarAccent.habits:
-        return habits;
-      case MadaarAccent.income:
-        return income;
-      case MadaarAccent.expense:
-        return isDark(context) ? expenseDark : expenseLight;
-      case MadaarAccent.journal:
-        return journal;
-    }
-  }
+  static Color accent(BuildContext context, MadaarAccent key) => stone;
 }

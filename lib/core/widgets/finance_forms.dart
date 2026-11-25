@@ -94,7 +94,7 @@ class _FinanceEntrySheetState extends State<FinanceEntrySheet> {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.bgElevated(context),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           border: Border.all(color: AppColors.borderSubtle(context)),
         ),
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),

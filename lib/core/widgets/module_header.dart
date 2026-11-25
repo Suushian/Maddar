@@ -20,7 +20,7 @@ class ModuleHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
       child: Row(
         children: <Widget>[
           Expanded(
@@ -34,7 +34,7 @@ class ModuleHeader extends StatelessWidget {
                         width: 8,
                         height: 8,
                         decoration: BoxDecoration(
-                          color: accent,
+                          color: AppColors.stone.withValues(alpha: 0.75),
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -57,12 +57,22 @@ class ModuleHeader extends StatelessWidget {
               ],
             ),
           ),
-          trailing ?? IconButton(
-            tooltip: 'تنظیمات',
-            onPressed: () => context.go('/settings'),
-            icon: const Icon(Icons.tune_rounded),
-            color: AppColors.textSecondary(context),
-          ),
+          trailing ??
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  color: AppColors.bgSurface(context),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.borderSubtle(context)),
+                ),
+                child: IconButton(
+                  tooltip: 'تنظیمات',
+                  onPressed: () => context.go('/settings'),
+                  icon: const Icon(Icons.tune_rounded, size: 22),
+                  color: AppColors.textSecondary(context),
+                ),
+              ),
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:madaar/core/theme/app_colors.dart';
 
 /// تایپوگرافی وزیرمتن باندلشده. تمام اعداد حالت tabular دارند تا ستونها تراز بمانند.
 abstract final class AppTypography {
@@ -25,11 +26,9 @@ abstract final class AppTypography {
 
   static TextTheme theme(Brightness brightness) {
     final Color primary = brightness == Brightness.dark
-        ? const Color(0xFFF3F5F8)
-        : const Color(0xFF11151C);
-    final Color secondary = brightness == Brightness.dark
-        ? const Color(0xFF949EAE)
-        : const Color(0xFF525C6B);
+        ? AppColors.paper
+        : AppColors.ink;
+    final Color secondary = AppColors.stone;
 
     return TextTheme(
       displayLarge: _style(

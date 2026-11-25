@@ -72,13 +72,8 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
     'droplet': Icons.water_drop_outlined,
     'moon': Icons.nightlight_round,
   };
-  static const List<Color> _colors = <Color>[
-    Color(0xFF10B981),
-    Color(0xFF38BDF8),
-    Color(0xFFC084FC),
-    Color(0xFFF59E0B),
-    Color(0xFF22C55E),
-  ];
+  static List<Color> get _colors =>
+        AppColors.neutralTones.take(5).toList();
 
   @override
   void dispose() {
@@ -94,7 +89,7 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.bgElevated(context),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
           border: Border.all(color: AppColors.borderSubtle(context)),
         ),
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),

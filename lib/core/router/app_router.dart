@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:madaar/core/widgets/floating_glass_dock.dart';
+import 'package:madaar/core/utils/motion.dart';
 import 'package:madaar/core/widgets/universal_quick_add.dart';
 import 'package:madaar/features/finance/presentation/finance_page.dart';
 import 'package:madaar/features/habits/presentation/habits_page.dart';
@@ -79,7 +80,7 @@ final GoRouter appRouter = GoRouter(
   ],
 );
 
-class _AppShell extends StatelessWidget {
+class _AppShell extends StatefulWidget {
   const _AppShell({required this.shell});
 
   final StatefulNavigationShell shell;
@@ -87,17 +88,70 @@ class _AppShell extends StatelessWidget {
   static const List<int> _quickAddTabs = <int>[0, 0, 3, 1, 2];
 
   @override
+  State<_AppShell> createState() => _AppShellState();
+}
+
+class _AppShellState extends State<_AppShell>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: Motion.page,
+  );
+  late final Animation<double> _curved = CurvedAnimation(
+    parent: _controller,
+    curve: Curves.easeOutCubic,
+  );
+  int _index = -1;
+
+  @override
+  void initState() {
+    super.initState();
+    _index = widget.shell.currentIndex;
+    _controller.value = 1;
+  }
+
+  @override
+  void didUpdateWidget(covariant _AppShell oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.shell.currentIndex != _index) {
+      _index = widget.shell.currentIndex;
+      if (!Motion.reduced(context)) {
+        _controller.forward(from: 0);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: shell,
-      bottomNavigationBar: FloatingGlassDock(
-        currentIndex: shell.currentIndex,
-        onDestinationSelected: (int index) => shell.goBranch(index),
-        onQuickAdd: () => UniversalQuickAdd.show(
-          context,
-          initialTab: _quickAddTabs[shell.currentIndex],
-        ),
-      ),
+    return AnimatedBuilder(
+      animation: _curved,
+      builder: (BuildContext context, Widget? child) {
+        final double opacity = 0.65 + 0.35 * _curved.value;
+        final double offsetY = (1 - _curved.value) * 10;
+        return Scaffold(
+          body: FadeTransition(
+            opacity: AlwaysStoppedAnimation<double>(opacity),
+            child: Transform.translate(
+              offset: Offset(0, offsetY),
+              child: widget.shell,
+            ),
+          ),
+          bottomNavigationBar: FloatingGlassDock(
+            currentIndex: widget.shell.currentIndex,
+            onDestinationSelected: (int index) => widget.shell.goBranch(index),
+            onQuickAdd: () => UniversalQuickAdd.show(
+              context,
+              initialTab: _AppShell._quickAddTabs[widget.shell.currentIndex],
+            ),
+          ),
+        );
+      },
     );
   }
 }

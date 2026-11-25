@@ -158,7 +158,7 @@ class _TaskTile extends StatelessWidget {
         alignment: Alignment.centerLeft,
         icon: Icons.check_rounded,
         label: 'انجام شد',
-        color: AppColors.habits,
+        color: AppColors.stone,
       ),
       secondaryBackground: _swipeBackground(
         context,
@@ -193,7 +193,7 @@ class _TaskTile extends StatelessWidget {
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: AppColors.bgSurface(context),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(24),
           border: Border.all(color: AppColors.borderSubtle(context)),
         ),
         child: Row(
@@ -213,7 +213,7 @@ class _TaskTile extends StatelessWidget {
                   ),
                 ),
                 child: task.isCompleted
-                    ? const Icon(Icons.check, size: 16, color: Colors.white)
+                    ? const Icon(Icons.check, size: 16, color: AppColors.paper)
                     : null,
               ),
             ),
@@ -328,13 +328,13 @@ class _TaskTile extends StatelessWidget {
   static Color _pillarColor(BuildContext context, String pillar) {
     switch (pillar) {
       case 'work':
-        return AppColors.accent(context, MadaarAccent.tasks);
+        return AppColors.stone;
       case 'health':
-        return AppColors.habits;
+        return AppColors.stone.withValues(alpha: 0.82);
       case 'personal':
-        return AppColors.brand(context);
+        return AppColors.stone.withValues(alpha: 0.64);
       default:
-        return AppColors.accent(context, MadaarAccent.journal);
+        return AppColors.stone.withValues(alpha: 0.46);
     }
   }
 
