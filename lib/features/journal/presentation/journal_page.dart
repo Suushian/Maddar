@@ -114,7 +114,7 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                                   Icons.battery_3_bar_rounded,
                                   Icons.battery_4_bar_rounded,
                                 ],
-                                color: AppColors.habits,
+                                color: AppColors.stone,
                                 onChanged: (int value) =>
                                     setState(() => _energy = value),
                               ),

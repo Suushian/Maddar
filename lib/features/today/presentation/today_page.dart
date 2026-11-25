@@ -324,7 +324,7 @@ class _HabitStrip extends StatelessWidget {
                             : Icons.radio_button_unchecked_rounded,
                         size: 18,
                         color: checked
-                            ? AppColors.habits
+                            ? AppColors.stone
                             : AppColors.textMuted(context),
                       ),
                       label: Text(

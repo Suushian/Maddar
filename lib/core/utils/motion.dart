@@ -3,8 +3,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 /// انیمیشنهای ورودی کوتاه و staggered با احترام به تنظیم reduced motion.
 abstract final class Motion {
-  static const Duration step = Duration(milliseconds: 70);
-  static const Duration duration = Duration(milliseconds: 320);
+  static const Duration step = Duration(milliseconds: 40);
+  static const Duration duration = Duration(milliseconds: 220);
+  static const Duration page = Duration(milliseconds: 220);
 
   static bool reduced(BuildContext context) =>
       MediaQuery.disableAnimationsOf(context);
@@ -36,8 +37,8 @@ abstract final class Motion {
         .scale(
           begin: const Offset(0.96, 0.96),
           end: const Offset(1, 1),
-          duration: const Duration(milliseconds: 380),
-          curve: Curves.elasticOut,
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
         );
   }
 }

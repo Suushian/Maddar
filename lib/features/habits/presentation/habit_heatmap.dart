@@ -54,8 +54,11 @@ class HabitHeatmap extends StatelessWidget {
 
 abstract final class HabitHeatmapColor {
   static Color of(String hex) {
-    final int value =
-        int.tryParse(hex.replaceFirst('#', ''), radix: 16) ?? 0xFF10B981;
+    final String raw = hex.replaceFirst('#', '');
+    final int value = int.tryParse(raw, radix: 16) ?? 0xFF898D84;
+    if (raw.length == 8) {
+      return Color(value);
+    }
     return Color(value | 0xFF000000);
   }
 }

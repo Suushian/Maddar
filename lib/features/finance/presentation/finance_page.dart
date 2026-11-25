@@ -29,17 +29,7 @@ class FinancePage extends ConsumerWidget {
     'other': 'متفرقه',
   };
 
-  static const List<Color> _chartColors = <Color>[
-    Color(0xFF38BDF8),
-    Color(0xFFF59E0B),
-    Color(0xFFC084FC),
-    Color(0xFF34D399),
-    Color(0xFFF472B6),
-    Color(0xFF94A3B8),
-    Color(0xFFFBBF24),
-    Color(0xFF818CF8),
-    Color(0xFF2DD4BF),
-  ];
+  static List<Color> get _chartColors => AppColors.neutralTones;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -293,7 +283,7 @@ class FinancePage extends ConsumerWidget {
                     ),
                     trailing: bill.lastPaidJalaliMonth == month
                         ? const Icon(Icons.check_circle_rounded,
-                            color: Colors.green)
+                            color: AppColors.stone)
                         : FilledButton.tonal(
                             onPressed: () async {
                               await Haptics.success();
@@ -330,7 +320,9 @@ class FinancePage extends ConsumerWidget {
                   trailing: Text(
                     '${tx.type == 'income' ? '+' : '−'}${CurrencyFormatter.format(tx.amount)}',
                     style: TextStyle(
-                      color: tx.type == 'income' ? Colors.green : accent,
+                      color: tx.type == 'income'
+                          ? AppColors.stone
+                          : AppColors.stone.withValues(alpha: 0.62),
                     ),
                   ),
                 ),

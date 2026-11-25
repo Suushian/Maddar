@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
 
-/// داک شیشهای شناور: ۵ تب ماژول + دکمه مرکزی ثبت سریع.
+/// نوار ناوبری ثابت پایین: ۵ تب آیکوندار + دکمه ثبت سریع در سمت چپ.
+/// محتوای صفحات بالای نوار قرار میگیرد و با آن همپوشانی ندارد.
 class FloatingGlassDock extends StatelessWidget {
   const FloatingGlassDock({
     super.key,
@@ -35,110 +36,173 @@ class FloatingGlassDock extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color border = AppColors.borderSubtle(context);
-    final Color selected = AppColors.brand(context);
+    final bool dark = AppColors.isDark(context);
+    final Color active = AppColors.brand(context);
     final Color idle = AppColors.textMuted(context);
 
     return SafeArea(
       top: false,
-      child: Stack(
-        clipBehavior: Clip.none,
-        alignment: Alignment.bottomCenter,
-        children: <Widget>[
-          Container(
-            height: 72,
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            decoration: BoxDecoration(
-              color: AppColors.bgElevated(context).withValues(alpha: 0.78),
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: border),
-              boxShadow: <BoxShadow>[
-                BoxShadow(
-                  color: AppColors.isDark(context)
-                      ? const Color(0x66000000)
-                      : const Color(0x140F172A),
-                  blurRadius: 24,
-                  offset: const Offset(0, 8),
-                ),
+      child: Container(
+        height: 88,
+        margin: const EdgeInsets.fromLTRB(16, 8, 16, 12),
+        decoration: BoxDecoration(
+          color: (dark ? AppColors.ink : AppColors.paper)
+              .withValues(alpha: dark ? 0.86 : 0.84),
+          borderRadius: BorderRadius.circular(36),
+          border: Border.all(color: AppColors.borderSubtle(context)),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: AppColors.ink.withValues(alpha: dark ? 0.32 : 0.08),
+              blurRadius: 30,
+              offset: const Offset(0, 8),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(36),
+          child: BackdropFilter(
+            filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+            child: Row(
+              children: <Widget>[
+                for (int i = 0; i < _labels.length; i++)
+                  Expanded(
+                    child: _Destination(
+                      icon: _icons[i],
+                      label: _labels[i],
+                      selected: currentIndex == i,
+                      active: active,
+                      idle: idle,
+                      onTap: () {
+                        if (currentIndex != i) {
+                          Haptics.toggle();
+                        }
+                        onDestinationSelected(i);
+                      },
+                    ),
+                  ),
+                _QuickAddSlot(dark: dark, onTap: onQuickAdd),
               ],
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(32),
-              child: BackdropFilter(
-                filter: ui.ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-                child: Row(
-                  children: <Widget>[
-                    for (int i = 0; i < _labels.length; i++)
-                      Expanded(
-                        child: Semantics(
-                          button: true,
-                          selected: currentIndex == i,
-                          label: _labels[i],
-                          child: InkWell(
-                            onTap: () {
-                              if (currentIndex != i) {
-                                Haptics.toggle();
-                              }
-                              onDestinationSelected(i);
-                            },
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                Icon(
-                                  _icons[i],
-                                  size: 22,
-                                  color: currentIndex == i ? selected : idle,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  _labels[i],
-                                  style: TextStyle(
-                                    fontFamily: 'Vazirmatn',
-                                    fontSize: 10,
-                                    color: currentIndex == i ? selected : idle,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _Destination extends StatelessWidget {
+  const _Destination({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.active,
+    required this.idle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final Color active;
+  final Color idle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 180),
+              curve: Curves.easeOutCubic,
+              width: 64,
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected
+                    ? AppColors.stone.withValues(alpha: 0.28)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Icon(
+                icon,
+                size: 23,
+                color: selected ? active : idle,
               ),
             ),
-          ),
-          Positioned(
-            bottom: 60,
-            child: GestureDetector(
-              onTap: () {
-                Haptics.tap();
-                onQuickAdd();
-              },
-              child: Container(
-                width: 56,
-                height: 56,
+            const SizedBox(height: 2),
+            Text(
+              label,
+              style: TextStyle(
+                fontFamily: 'Vazirmatn',
+                fontSize: 10.5,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                color: selected ? active : idle,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _QuickAddSlot extends StatelessWidget {
+  const _QuickAddSlot({required this.dark, required this.onTap});
+
+  final bool dark;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 76,
+      child: Semantics(
+        button: true,
+        label: 'ثبت سریع',
+        child: InkWell(
+          onTap: () {
+            Haptics.tap();
+            onTap();
+          },
+          borderRadius: BorderRadius.circular(26),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Container(
+                width: 52,
+                height: 52,
                 decoration: BoxDecoration(
+                  color: dark ? AppColors.paper : AppColors.ink,
                   shape: BoxShape.circle,
-                  color: selected,
-                  border: Border.all(
-                    color: AppColors.bgPrimary(context),
-                    width: 3,
-                  ),
-                  boxShadow: <BoxShadow>[
-                    BoxShadow(
-                      color: selected.withValues(alpha: 0.35),
-                      blurRadius: 18,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
                 ),
-                child: const Icon(Icons.add_rounded, color: Colors.white, size: 28),
+                child: Icon(
+                  Icons.add_rounded,
+                  size: 28,
+                  color: dark ? AppColors.ink : AppColors.paper,
+                ),
               ),
-            ),
+              const SizedBox(height: 2),
+              Text(
+                'ثبت',
+                style: TextStyle(
+                  fontFamily: 'Vazirmatn',
+                  fontSize: 10.5,
+                  color: AppColors.textMuted(context),
+                ),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

@@ -2,31 +2,93 @@ import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/theme/app_typography.dart';
 
-/// ساخت تمهای کامل Material 3 از توکنهای مدار.
+/// انتقال نرم صفحهها: fade همراه جابهجایی کوتاه ۲۲۰ms با easeOutCubic.
+class MadaarPageTransition extends PageTransitionsBuilder {
+  MadaarPageTransition();
+
+  @override
+  Duration get transitionDuration => const Duration(milliseconds: 220);
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T>? route,
+    BuildContext? context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final Animation<double> curved = CurvedAnimation(
+      parent: animation,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
+    );
+    return FadeTransition(
+      opacity: curved,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.035),
+          end: Offset.zero,
+        ).animate(curved),
+        child: child,
+      ),
+    );
+  }
+}
+
+/// ساخت تمهای کامل Material 3 از سه رنگ ثابت مدار.
 abstract final class AppTheme {
   static final ThemeData light = _build(Brightness.light);
   static final ThemeData dark = _build(Brightness.dark);
 
   static ThemeData _build(Brightness brightness) {
     final bool isDark = brightness == Brightness.dark;
-    final Color background = isDark ? AppColors.bgDark : AppColors.bgLight;
-    final Color surface = isDark ? AppColors.surfaceDark : Colors.white;
-    final Color elevated = isDark ? AppColors.elevatedDark : Colors.white;
-    final Color onSurface = isDark ? AppColors.textDark : AppColors.textLight;
+    final Color background = isDark ? AppColors.ink : AppColors.paper;
+    final Color surface =
+        AppColors.stone.withValues(alpha: isDark ? 0.11 : 0.07);
+    final Color elevated = isDark
+        ? AppColors.stone.withValues(alpha: 0.16)
+        : AppColors.paper;
+    final Color onSurface = isDark ? AppColors.paper : AppColors.ink;
+    final Color onFilled = isDark ? AppColors.ink : AppColors.paper;
     final TextTheme textTheme = AppTypography.theme(brightness);
 
+    // تمام رنگهای قابل دیدن صریحاً به سه رنگ خنثی مدار بازنویسی میشوند.
     final ColorScheme scheme = ColorScheme.fromSeed(
-      seedColor: AppColors.brandLight,
+      seedColor: AppColors.stone,
       brightness: brightness,
     ).copyWith(
-      primary: isDark ? AppColors.brandDark : AppColors.brandLight,
-      onPrimary: Colors.white,
+      primary: AppColors.stone,
+      onPrimary: onFilled,
+      primaryContainer: AppColors.stone.withValues(alpha: 0.24),
+      onPrimaryContainer: onSurface,
+      secondary: AppColors.stone,
+      onSecondary: onFilled,
+      secondaryContainer: AppColors.stone.withValues(alpha: 0.16),
+      onSecondaryContainer: onSurface,
+      tertiary: AppColors.stone,
+      onTertiary: onFilled,
+      tertiaryContainer: AppColors.stone.withValues(alpha: 0.14),
+      onTertiaryContainer: onSurface,
+      error: AppColors.stone,
+      onError: onFilled,
+      errorContainer: AppColors.stone.withValues(alpha: 0.18),
+      onErrorContainer: onSurface,
       surface: surface,
       onSurface: onSurface,
+      surfaceTint: Colors.transparent,
+      surfaceContainerLowest: background,
+      surfaceContainerLow: surface,
+      surfaceContainer: surface,
+      surfaceContainerHigh: elevated,
       surfaceContainerHighest: elevated,
-      outline: isDark
-          ? const Color(0x1AFFFFFF)
-          : const Color(0x0F0F172A),
+      onSurfaceVariant: AppColors.stone,
+      outline: AppColors.stone.withValues(alpha: 0.38),
+      outlineVariant: AppColors.stone.withValues(alpha: 0.22),
+      shadow: AppColors.ink,
+      scrim: AppColors.ink,
+      inverseSurface: isDark ? AppColors.paper : AppColors.ink,
+      onInverseSurface: isDark ? AppColors.ink : AppColors.paper,
+      inversePrimary: AppColors.stone,
     );
 
     return ThemeData(
@@ -38,6 +100,16 @@ abstract final class AppTheme {
       textTheme: textTheme,
       dividerColor: scheme.outline,
       iconTheme: IconThemeData(color: onSurface),
+      pageTransitionsTheme: PageTransitionsTheme(
+        builders: <TargetPlatform, PageTransitionsBuilder>{
+          TargetPlatform.android: MadaarPageTransition(),
+          TargetPlatform.iOS: MadaarPageTransition(),
+          TargetPlatform.fuchsia: MadaarPageTransition(),
+          TargetPlatform.linux: MadaarPageTransition(),
+          TargetPlatform.macOS: MadaarPageTransition(),
+          TargetPlatform.windows: MadaarPageTransition(),
+        },
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: background,
         surfaceTintColor: Colors.transparent,
@@ -47,16 +119,16 @@ abstract final class AppTheme {
         titleTextStyle: textTheme.titleLarge?.copyWith(color: onSurface),
       ),
       bottomSheetTheme: BottomSheetThemeData(
-        backgroundColor: elevated.withValues(alpha: isDark ? 0.96 : 1),
+        backgroundColor: elevated,
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
       visualDensity: VisualDensity.standard,
     );

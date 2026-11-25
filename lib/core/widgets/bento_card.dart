@@ -1,7 +1,10 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
+import 'package:madaar/core/utils/motion.dart';
 
-/// کارت استاندارد Bento با حاشیه نورانی ظریف، شعاع ۲۴ و لمس نرم.
+/// کارت Bento شیشهای با شعاع ۲۸، حاشیه Stone و سایه نرم Ink.
 class BentoCard extends StatelessWidget {
   const BentoCard({
     super.key,
@@ -9,13 +12,15 @@ class BentoCard extends StatelessWidget {
     this.padding = const EdgeInsets.all(16),
     this.onTap,
     this.accent,
-    this.radius = 24,
+    this.radius = 28,
     this.height,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
+
+  /// نگه داشتهشده برای سازگاری؛ رنگهای جداگانه ماژولها حذف شدند.
   final Color? accent;
   final double radius;
   final double? height;
@@ -23,13 +28,15 @@ class BentoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final BorderRadius borderRadius = BorderRadius.circular(radius);
-    final BoxShadow? shadow = AppColors.isDark(context)
+    final List<BoxShadow>? shadows = AppColors.isDark(context)
         ? null
-        : const BoxShadow(
-            color: Color(0x0F0F172A),
-            blurRadius: 24,
-            offset: Offset(0, 8),
-          );
+        : <BoxShadow>[
+            BoxShadow(
+              color: AppColors.ink.withValues(alpha: 0.06),
+              blurRadius: 24,
+              offset: const Offset(0, 8),
+            ),
+          ];
 
     Widget card = Container(
       height: height,
@@ -37,30 +44,16 @@ class BentoCard extends StatelessWidget {
         color: AppColors.bgSurface(context),
         borderRadius: borderRadius,
         border: Border.all(color: AppColors.borderSubtle(context)),
-        boxShadow: shadow == null ? null : <BoxShadow>[shadow],
+        boxShadow: shadows,
       ),
-      child: Padding(padding: padding, child: child),
+      child: ClipRRect(
+        borderRadius: borderRadius,
+        child: BackdropFilter(
+          filter: ui.ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+          child: Padding(padding: padding, child: child),
+        ),
+      ),
     );
-
-    if (accent != null) {
-      card = Stack(
-        children: <Widget>[
-          card,
-          Positioned(
-            right: 0,
-            top: 18,
-            bottom: 18,
-            child: Container(
-              width: 3,
-              decoration: BoxDecoration(
-                color: accent,
-                borderRadius: BorderRadius.circular(3),
-              ),
-            ),
-          ),
-        ],
-      );
-    }
 
     if (onTap == null) {
       return card;
@@ -71,7 +64,7 @@ class BentoCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: borderRadius,
-        child: card,
+        child: Motion.spring(context, card),
       ),
     );
   }
