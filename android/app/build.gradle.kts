@@ -21,7 +21,7 @@ val hasReleaseSigning = keystorePropertiesFile.exists() &&
 
 android {
     namespace = "ir.madaar.app"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 36
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
