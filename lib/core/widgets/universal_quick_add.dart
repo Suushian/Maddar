@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madaar/core/database/database_providers.dart';
-import 'package:madaar/core/database/models.dart';
 import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/currency_formatter.dart';
@@ -66,7 +65,9 @@ class _UniversalQuickAddState extends State<UniversalQuickAdd>
           borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           border: Border.all(color: AppColors.borderSubtle(context)),
         ),
-        child: Column(
+        child: Material(
+          color: Colors.transparent,
+          child: Column(
           children: <Widget>[
             Text(
               'ثبت سریع',
@@ -93,6 +94,7 @@ class _UniversalQuickAddState extends State<UniversalQuickAdd>
             ),
             Expanded(
               child: TabBarView(
+                controller: _controller,
                 children: <Widget>[
                   _TaskQuickForm(),
                   _TransactionQuickForm(),
@@ -103,6 +105,7 @@ class _UniversalQuickAddState extends State<UniversalQuickAdd>
             ),
           ],
         ),
+          ),
       ),
     );
   }
@@ -149,33 +152,46 @@ abstract final class _QuickFormStyle {
   }) {
     return Form(
       key: formKey,
-      child: Padding(
-        padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: <Widget>[
-            Text(title, style: Theme.of(context).textTheme.titleMedium),
-            const SizedBox(height: 12),
-            ...fields,
-            const Spacer(),
-            FilledButton(
-              style: FilledButton.styleFrom(
-                minimumSize: const Size.fromHeight(52),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+      child: LayoutBuilder(
+        builder: (BuildContext context, BoxConstraints constraints) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(24, 16, 24, 24),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Text(title, style: Theme.of(context).textTheme.titleMedium),
+                  const SizedBox(height: 12),
+                  ...fields,
+                  const SizedBox(height: 16),
+                  FilledButton(
+                    style: FilledButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                    ),
+                    onPressed: () async {
+                      if (!(formKey.currentState?.validate() ?? false)) {
+                        return;
+                      }
+                      await onSave();
+                      // Haptics are cosmetic and must not block a saved action.
+                      try {
+                        await Haptics.success();
+                      } on Object {
+                        // ignore: avoid_catches_without_on_clauses
+                      }
+                    },
+                    child: Text(actionLabel),
+                  ),
+                ],
               ),
-              onPressed: () async {
-                if (!(formKey.currentState?.validate() ?? false)) {
-                  return;
-                }
-                await Haptics.success();
-                await onSave();
-              },
-              child: Text(actionLabel),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }

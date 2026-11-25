@@ -28,9 +28,9 @@ void main() {
     await tester.pumpWidget(
       ProviderScope(
         overrides: <Override>[
-          settingsRepositoryProvider.overrideWithValue(repo),
+          settingsRepositoryProvider.overrideWith((ref) => Future<SettingsRepository>.value(repo)),
         ],
-        child: const MaterialApp(
+        child: MaterialApp(
           home: OnboardingPage(settings: settings, repository: repo),
         ),
       ),
