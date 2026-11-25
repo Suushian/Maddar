@@ -54,6 +54,17 @@
 - پارسر Dart: ۴۸ فایل، ۰ خطای سینتکس.
 - تعادل براکتهای `build.gradle.kts`: برقرار.
 
+
+## نسخه دیباگ بدون امضا
+
+برای مواردی که فقط دانلود سریع APK نیاز است و نمیخواهیم Release امضاشده منتشر کنیم، ورکفلوی جداگانه `.github/workflows/build-debug-apk.yml` وجود دارد:
+
+```bash
+gh workflow run build-debug-apk.yml -f release_tag=debug-latest
+```
+
+این ورکفلو `flutter build apk --debug` را اجرا میکند، فایل `madaar-debug.apk` و SHA‑256 آن را بهعنوان Artifact آپلود میکند و در تگ مشخصشده یک Release **pre-release** بدون امضا ایجاد یا بهروز میکند. هیچ Secret امضایی لازم نیست.
+
 ## باقیمانده
 
 اجرای واقعی GitHub Actions وابسته به محیط GitHub و تنظیم Secrets است. در این sandbox امکان اجرای `flutter build apk` وجود ندارد. پس از push به `main` میتوان نتیجه را در تب Actions مشاهده کرد.
