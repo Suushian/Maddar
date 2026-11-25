@@ -1,27 +1,21 @@
-# مدار — پیشنمایش بازطراحی بصری
+# مدار — بازطراحی به سبک Notion / Obsidian
 
-تصاویر زیر مفهومی و ثابتاند (اسکرینشات از APK نیستند).
+پیشنمایشهای مسطح و تخت (اسکرینشات زنده نیستند).
 
 | صفحه | فایل |
 |---|---|
-| نمای کلی + پالت + قواعد | `design-board.png` |
-| امروز (روشن) | `design-today.png` |
-| امروز (تاریک) | `design-today-dark.png` |
+| نمای کلی | `design-board.png` |
+| امروز (روشن / تاریک) | `design-today.png` / `design-today-dark.png` |
 | کارها | `design-tasks.png` |
 | عادت‌ها | `design-habits.png` |
 | جیب | `design-finance.png` |
-| خلوت / ژورنال | `design-journal.png` |
+| خلوت | `design-journal.png` |
+| آنبوردینگ (مرحله نام) | `design-onboarding.png` |
 
-![نمای کلی طراحی](design-board.png)
-
-![صفحه امروز](design-today.png)
-
-![صفحه امروز تاریک](design-today-dark.png)
-
-![صفحه کارها](design-tasks.png)
-
-![صفحه عادت‌ها](design-habits.png)
-
-![صفحه جیب](design-finance.png)
-
-![صفحه خلوت](design-journal.png)
+![نمای کلی](design-board.png)
+![امروز](design-today.png)
+![کارها](design-tasks.png)
+![عادت‌ها](design-habits.png)
+![جیب](design-finance.png)
+![خلوت](design-journal.png)
+![آنبوردینگ](design-onboarding.png)

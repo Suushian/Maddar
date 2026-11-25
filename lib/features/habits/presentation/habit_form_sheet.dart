@@ -89,7 +89,7 @@ class _HabitFormSheetState extends State<HabitFormSheet> {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.bgElevated(context),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           border: Border.all(color: AppColors.borderSubtle(context)),
         ),
         padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),

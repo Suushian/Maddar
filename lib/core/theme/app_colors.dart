@@ -6,9 +6,9 @@ enum MadaarAccent { tasks, habits, income, expense, journal }
 
 /// سه رنگ ثابت و خنثی مدار;ทุก شفافیتها از همین سه رنگ میآیند.
 abstract final class AppColors {
-  static const Color paper = Color(0xFFEFEDE8);
-  static const Color ink = Color(0xFF242521);
-  static const Color stone = Color(0xFF898D84);
+  static const Color paper = Color(0xFFF7F6F3);
+  static const Color ink = Color(0xFF202124);
+  static const Color stone = Color(0xFF9B9A97);
 
   /// نامهای قدیمی توکنها برای سازگاری؛ همگی به Stone خنثی اشاره میکنند.
   static const Color brandLight = stone;
@@ -46,17 +46,15 @@ abstract final class AppColors {
   static Color bgPrimary(BuildContext context) =>
       isDark(context) ? ink : paper;
 
-  /// سطح کارتها: همان Stone با شفافیت کم، روی پسزمینه Paper/Ink.
+  /// سطح کارتها: همان رنگ پسزمینه با خط مرزی نازک، بدون شیشه و سایه سنگین.
   static Color bgSurface(BuildContext context) =>
-      stone.withValues(alpha: isDark(context) ? 0.11 : 0.07);
+      isDark(context) ? ink : paper;
 
   static Color bgElevated(BuildContext context) =>
-      isDark(context)
-          ? stone.withValues(alpha: 0.16)
-          : paper.withValues(alpha: 0.96);
+      isDark(context) ? ink : paper;
 
   static Color borderSubtle(BuildContext context) =>
-      stone.withValues(alpha: isDark(context) ? 0.24 : 0.22);
+      stone.withValues(alpha: isDark(context) ? 0.26 : 0.30);
 
   static Color textPrimary(BuildContext context) =>
       Theme.of(context).colorScheme.onSurface;
