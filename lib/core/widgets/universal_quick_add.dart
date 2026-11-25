@@ -387,6 +387,7 @@ class _JournalQuickFormState extends ConsumerState<_JournalQuickForm> {
               autofocus: true,
               maxLines: 5,
               decoration: _QuickFormStyle.input(
+                context,
                 'بهترین لحظه کوچک امروز چی بود؟',
               ),
               validator: (String? value) => (value?.trim().isEmpty ?? true)

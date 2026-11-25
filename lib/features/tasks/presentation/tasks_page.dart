@@ -235,7 +235,7 @@ class _TaskTile extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    '${TasksPage._pillarLabels[task.pillar] ?? task.pillar}'
+                    '${_pillarLabels[task.pillar] ?? task.pillar}'
                     '${task.priority == 1 ? '  ·  مهم' : ''}',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),

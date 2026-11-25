@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:madaar/core/database/models.dart';
+import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
 /// یادآور محلی کاملاً روی دستگاه؛ هیچ اطلاعاتی از دستگاه خارج نمیشود.
@@ -20,7 +21,7 @@ class NotificationService {
     if (_initialized) {
       return;
     }
-    tz.initializeTimeZones();
+    tzdata.initializeTimeZones();
     tz.setLocalLocation(tz.getLocation('Asia/Tehran'));
 
     const AndroidInitializationSettings android =

@@ -251,6 +251,7 @@ class _JournalPageState extends ConsumerState<JournalPage> {
               ) ==
               month,
         )
+        .toList()
         ..sort((a, b) => a.dateKey.compareTo(b.dateKey));
 
     return BentoCard(
