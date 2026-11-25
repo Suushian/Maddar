@@ -11,6 +11,10 @@ void main() {
       await tester.pumpWidget(
         MaterialApp(
           theme: theme,
+          darkTheme: theme,
+          themeMode: theme.brightness == Brightness.dark
+              ? ThemeMode.dark
+              : ThemeMode.light,
           home: const Scaffold(
             body: Center(
               child: BentoCard(child: SizedBox(height: 40, width: 120)),

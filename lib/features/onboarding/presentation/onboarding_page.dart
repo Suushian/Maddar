@@ -217,7 +217,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
       };
 
   Future<void> _finish({required bool saveValues}) async {
-    await Haptics.success();
     final SettingsModel current = widget.settings;
     final int? budget = saveValues
         ? CurrencyFormatter.parse(_budget.text)
@@ -239,6 +238,12 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
         onboardingCompleted: true,
       ),
     );
+    // Haptics are cosmetic; a missing platform channel must never block onboarding.
+    try {
+      await Haptics.success();
+    } on Object {
+      // ignore: avoid_catches_without_on_clauses
+    }
     ref.read(themeModeProvider.notifier).state = switch (themeMode) {
       'dark' => ThemeMode.dark,
       'light' => ThemeMode.light,

@@ -92,6 +92,7 @@ class _UniversalQuickAddState extends State<UniversalQuickAdd>
             ),
             Expanded(
               child: TabBarView(
+                controller: _controller,
                 children: <Widget>[
                   _TaskQuickForm(),
                   _TransactionQuickForm(),
