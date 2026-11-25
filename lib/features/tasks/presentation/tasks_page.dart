@@ -11,6 +11,13 @@ import 'package:madaar/core/widgets/empty_state_view.dart';
 import 'package:madaar/core/widgets/module_header.dart';
 import 'package:madaar/core/widgets/universal_quick_add.dart';
 
+const Map<String, String> _pillarLabels = <String, String>{
+  'work': 'کار و رشد',
+  'health': 'سلامتی',
+  'personal': 'شخصی و خانه',
+  'learning': 'یادگیری',
+};
+
 class TasksPage extends ConsumerStatefulWidget {
   const TasksPage({super.key});
 
@@ -25,13 +32,6 @@ class _TasksPageState extends ConsumerState<TasksPage> {
     'صندوق ورودی',
     'برنامهریزیشده',
   ];
-
-  static const Map<String, String> _pillarLabels = <String, String>{
-    'work': 'کار و رشد',
-    'health': 'سلامتی',
-    'personal': 'شخصی و خانه',
-    'learning': 'یادگیری',
-  };
 
   @override
   Widget build(BuildContext context) {
