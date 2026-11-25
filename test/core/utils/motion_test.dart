@@ -5,7 +5,7 @@ import 'package:madaar/core/utils/motion.dart';
 void main() {
   testWidgets('کاهش حرکت، انیمیشن فشار را کاملاً حذف میکند', (tester) async {
     await tester.pumpWidget(
-      const MediaQuery(
+      MediaQuery(
         data: MediaQueryData(disableAnimations: true),
         child: Directionality(
           textDirection: TextDirection.rtl,
@@ -27,7 +27,7 @@ void main() {
   testWidgets('کاهش حرکت، تعویض محتوا را بدون AnimatedSwitcher میسازد',
       (tester) async {
     await tester.pumpWidget(
-      const MediaQuery(
+      MediaQuery(
         data: MediaQueryData(disableAnimations: true),
         child: Directionality(
           textDirection: TextDirection.rtl,
@@ -48,7 +48,7 @@ void main() {
 
   testWidgets('اعداد با فرمتدهندهی فارسی نمایش داده میشوند', (tester) async {
     await tester.pumpWidget(
-      const Directionality(
+      Directionality(
         textDirection: TextDirection.rtl,
         child: Builder(
           builder: (BuildContext context) => Motion.number(
