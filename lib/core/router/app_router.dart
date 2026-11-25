@@ -147,7 +147,7 @@ class _AppShellState extends State<_AppShell>
             onDestinationSelected: (int index) => widget.shell.goBranch(index),
             onQuickAdd: () => UniversalQuickAdd.show(
               context,
-              initialTab: _quickAddTabs[widget.shell.currentIndex],
+              initialTab: _AppShell._quickAddTabs[widget.shell.currentIndex],
             ),
           ),
         );
