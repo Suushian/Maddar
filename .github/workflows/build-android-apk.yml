@@ -1,0 +1,153 @@
+name: Build Android APK
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: madaar-android-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Analyze, test and build APK
+    runs-on: ubuntu-latest
+    outputs:
+      signed: ${{ steps.signing.outputs.signed }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Read Flutter version from .fvmrc
+        id: flutter_version
+        shell: bash
+        run: |
+          version=$(python3 -c 'import json; print(json.load(open(".fvmrc"))["flutter"])')
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ steps.flutter_version.outputs.version }}
+          channel: stable
+          cache: true
+
+      - name: Cache Gradle
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pub-cache
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties', 'pubspec.lock') }}
+          restore-keys: ${{ runner.os }}-gradle-
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run code generators
+        run: dart run build_runner build --delete-conflicting-outputs
+
+      - name: Analyze
+        run: flutter analyze
+
+      - name: Test
+        run: flutter test
+
+      - name: Prepare signing (fallback to unsigned)
+        id: signing
+        shell: bash
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          if [ -n "$ANDROID_KEYSTORE_BASE64" ] && \
+             [ -n "$ANDROID_KEYSTORE_PASSWORD" ] && \
+             [ -n "$ANDROID_KEY_ALIAS" ] && \
+             [ -n "$ANDROID_KEY_PASSWORD" ]; then
+            echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > android/app/release-key.jks
+            cat > android/key.properties <<EOF
+          storeFile=app/release-key.jks
+          storePassword=$ANDROID_KEYSTORE_PASSWORD
+          keyAlias=$ANDROID_KEY_ALIAS
+          keyPassword=$ANDROID_KEY_PASSWORD
+          EOF
+            echo "signed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "::warning::Signing secrets are not set; building an unsigned APK for artifact only."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build release APK
+        run: flutter build apk --release --obfuscate --split-debug-info=build/debug-info
+
+      - name: Rename APK and compute SHA-256
+        id: artifact
+        shell: bash
+        env:
+          SIGNED: ${{ steps.signing.outputs.signed }}
+        run: |
+          if [ "$SIGNED" = "true" ]; then
+            cp build/app/outputs/flutter-apk/app-release.apk madaar-release.apk
+            echo "name=madaar-release.apk" >> "$GITHUB_OUTPUT"
+            sha256sum madaar-release.apk > madaar-release.sha256
+          else
+            cp build/app/outputs/flutter-apk/app-release.apk madaar-release-unsigned.apk
+            echo "name=madaar-release-unsigned.apk" >> "$GITHUB_OUTPUT"
+            sha256sum madaar-release-unsigned.apk > madaar-release-unsigned.sha256
+          fi
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: madaar-apk
+          path: |
+            madaar-release*.apk
+            madaar-release*.sha256
+          if-no-files-found: error
+
+  release:
+    name: Publish signed release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v') && needs.build.outputs.signed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: madaar-apk
+          path: release-assets
+
+      - name: Create or update GitHub Release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          tag="${GITHUB_REF_NAME}"
+          apk=$(find release-assets -name 'madaar-release.apk' -print -quit)
+          checksum=$(find release-assets -name 'madaar-release.sha256' -print -quit)
+          if gh release view "$tag" >/dev/null 2>&1; then
+            gh release upload "$tag" "$apk" "$checksum" --clobber
+          else
+            gh release create "$tag" "$apk" "$checksum" --title "مدار $tag" --generate-notes
+          fi
