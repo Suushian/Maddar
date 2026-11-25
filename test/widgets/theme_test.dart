@@ -12,6 +12,7 @@ void main() {
         MaterialApp(
           theme: theme,
           darkTheme: theme,
+          themeAnimationStyle: AnimationStyle.noAnimation,
           themeMode: theme.brightness == Brightness.dark
               ? ThemeMode.dark
               : ThemeMode.light,

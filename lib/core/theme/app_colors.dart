@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 /// نگه داشتن enum تنها برای سازگاری API است، نه برای رنگ جداگانه.
 enum MadaarAccent { tasks, habits, income, expense, journal }
 
-/// سه رنگ ثابت و خنثی مدار;ทุก شفافیتها از همین سه رنگ میآیند.
+/// سه رنگ ثابت و خنثی مدار؛ تمام شفافیتها از همین سه رنگ میآیند.
 abstract final class AppColors {
   static const Color paper = Color(0xFFF7F6F3);
   static const Color ink = Color(0xFF202124);
