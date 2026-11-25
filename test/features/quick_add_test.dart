@@ -32,10 +32,10 @@ void main() {
 
   Widget wrap() => ProviderScope(
         overrides: <Override>[
-          tasksRepositoryProvider.overrideWithValue(tasks),
-          financeRepositoryProvider.overrideWithValue(finance),
-          journalRepositoryProvider.overrideWithValue(journal),
-          habitsRepositoryProvider.overrideWithValue(habits),
+          tasksRepositoryProvider.overrideWith((ref) => Future<TasksRepository>.value(tasks)),
+          financeRepositoryProvider.overrideWith((ref) => Future<FinanceRepository>.value(finance)),
+          journalRepositoryProvider.overrideWith((ref) => Future<JournalRepository>.value(journal)),
+          habitsRepositoryProvider.overrideWith((ref) => Future<HabitsRepository>.value(habits)),
         ],
         child: const MaterialApp(
           home: Scaffold(body: _OpenSheetButton()),
