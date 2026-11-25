@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 /// سیستم حرکت واحد مدار: تمامی ورودها، فشارها و تعویضها از اینجا میآیند.
@@ -74,7 +76,7 @@ abstract final class Motion {
     if (reduced(context)) {
       return child;
     }
-    return PressScale(child: child, minScale: minScale);
+    return PressScale(minScale: minScale, child: child);
   }
 
   /// یک تپ ملایم تأکیدی برای موفقیتها (تیک، ذخیره، تغییر تم).
@@ -89,21 +91,14 @@ abstract final class Motion {
     }
     return TweenAnimationBuilder<double>(
       key: ValueKey<String>('motion-pulse-${id ?? ''}'),
-      tween: TweenSequence<double>(<TweenSequenceItem<double>>[
-        TweenSequenceItem<double>(
-          tween: Tween<double>(begin: 1, end: scale),
-          weight: 1,
-          curve: Curves.easeOutCubic,
-        ),
-        TweenSequenceItem<double>(
-          tween: Tween<double>(begin: scale, end: 1),
-          weight: 1,
-          curve: Curves.easeInOutCubic,
-        ),
-      ]),
+      tween: Tween<double>(begin: 0, end: 1),
       duration: base,
+      curve: Curves.easeOutCubic,
       builder: (BuildContext context, double value, Widget? child) =>
-          Transform.scale(scale: value, child: child),
+          Transform.scale(
+        scale: 1 + (scale - 1) * math.sin(math.pi * value),
+        child: child,
+      ),
       child: child,
     );
   }
