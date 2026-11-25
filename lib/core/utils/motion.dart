@@ -69,12 +69,12 @@ abstract final class Motion {
   static Widget press(
     BuildContext context,
     Widget child, {
-    double scale = 0.96,
+    double minScale = 0.96,
   }) {
     if (reduced(context)) {
       return child;
     }
-    return PressScale(child: child, minScale: scale);
+    return PressScale(child: child, minScale: minScale);
   }
 
   /// یک تپ ملایم تأکیدی برای موفقیتها (تیک، ذخیره، تغییر تم).
