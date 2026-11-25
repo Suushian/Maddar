@@ -20,7 +20,7 @@ dependencies:
   path_provider: ^2.1.2
 
   go_router: ^14.2.0
-  shamsi_date: ^2.0.0
+  shamsi_date: ^1.1.1
   intl: ^0.20.3
 
   lucide_icons_flutter: ^3.0.0
