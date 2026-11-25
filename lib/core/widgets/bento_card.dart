@@ -45,7 +45,7 @@ class BentoCard extends StatelessWidget {
       child: InkWell(
         onTap: onTap,
         borderRadius: borderRadius,
-        child: Motion.spring(context, card),
+        child: Motion.press(context, card, minScale: 0.975),
       ),
     );
   }

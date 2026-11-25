@@ -9,6 +9,7 @@ import 'package:madaar/core/database/repositories.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
 import 'package:madaar/core/utils/jalali_helper.dart';
+import 'package:madaar/core/utils/motion.dart';
 import 'package:madaar/core/widgets/async_repo_view.dart';
 import 'package:madaar/core/widgets/bento_card.dart';
 import 'package:madaar/core/widgets/module_header.dart';
@@ -123,16 +124,19 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                                 spacing: 8,
                                 children: <Widget>[
                                   for (final String tag in _tagOptions)
-                                    FilterChip(
-                                      label: Text(tag),
-                                      selected: _tags.contains(tag),
-                                      onSelected: (selected) => setState(() {
-                                        if (selected) {
-                                          _tags.add(tag);
-                                        } else {
-                                          _tags.remove(tag);
-                                        }
-                                      }),
+                                    Motion.press(
+                                      context,
+                                      FilterChip(
+                                        label: Text(tag),
+                                        selected: _tags.contains(tag),
+                                        onSelected: (selected) => setState(() {
+                                          if (selected) {
+                                            _tags.add(tag);
+                                          } else {
+                                            _tags.remove(tag);
+                                          }
+                                        }),
+                                      ),
                                     ),
                                 ],
                               ),
@@ -152,7 +156,7 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                               const SizedBox(height: 12),
                               Align(
                                 alignment: Alignment.centerLeft,
-                                child: FilledButton(
+                                child: Motion.press(context, FilledButton(
                                   onPressed: () async {
                                     await Haptics.success();
                                     await repo.upsert(
@@ -174,7 +178,7 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                                   child: Text(todayEntry == null
                                       ? 'ذخیره یادداشت'
                                       : 'بهروزرسانی یادداشت'),
-                                ),
+                                )),
                               ),
                             ],
                           ),
@@ -197,7 +201,9 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                                     in snapshot.data!
                                         .where((item) => item.dateKey != today)
                                         .take(10))
-                                  ListTile(
+                                  Motion.entrance(
+                                    context,
+                                    ListTile(
                                     contentPadding: EdgeInsets.zero,
                                     title: Text(
                                       entry.content.isEmpty
@@ -225,6 +231,9 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                                           );
                                       });
                                     },
+                                    ),
+                                    snapshot.data!.indexOf(entry),
+                                    id: 'journal-${entry.dateKey}',
                                   ),
                               ],
                             ),
@@ -254,8 +263,10 @@ class _JournalPageState extends ConsumerState<JournalPage> {
         .toList()
         ..sort((a, b) => a.dateKey.compareTo(b.dateKey));
 
-    return BentoCard(
-      child: Column(
+    return Motion.entrance(
+      context,
+      BentoCard(
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           Text(
@@ -290,7 +301,10 @@ class _JournalPageState extends ConsumerState<JournalPage> {
                   ),
           ),
         ],
+        ),
       ),
+      1,
+      id: 'journal',
     );
   }
 
@@ -304,12 +318,20 @@ class _JournalPageState extends ConsumerState<JournalPage> {
       spacing: 6,
       children: <Widget>[
         for (int i = 1; i <= icons.length; i++)
-          IconButton(
-            tooltip: '${JalaliHelper.faDigits(i)} از ۵',
-            onPressed: () => onChanged(i),
-            icon: Icon(
-              icons[i - 1],
-              color: value >= i ? color : AppColors.textMuted(context),
+          Motion.press(
+            context,
+            IconButton(
+              tooltip: '${JalaliHelper.faDigits(i)} از ۵',
+              onPressed: () => onChanged(i),
+              icon: AnimatedScale(
+                scale: value >= i ? 1.14 : 1,
+                duration: Motion.fast,
+                curve: Curves.easeOutBack,
+                child: Icon(
+                  icons[i - 1],
+                  color: value >= i ? color : AppColors.textMuted(context),
+                ),
+              ),
             ),
           ),
       ],

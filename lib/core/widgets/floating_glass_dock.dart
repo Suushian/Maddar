@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/utils/haptics.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 /// نوار ناوبری ثابت و مسطح پایین: پنج تب آیکوندار + دکمه ثبت.
 /// سبک Notion/Obsidian: پسزمینه تخت، خط جداکننده بالا، بدون شیشه و سایه.
@@ -53,23 +54,33 @@ class FloatingGlassDock extends StatelessWidget {
             children: <Widget>[
               for (int i = 0; i < _labels.length; i++)
                 Expanded(
-                  child: _Destination(
-                    icon: _icons[i],
-                    label: _labels[i],
-                    selected: currentIndex == i,
-                    active: active,
-                    idle: idle,
-                    onTap: () {
-                      if (currentIndex != i) {
-                        Haptics.toggle();
-                      }
-                      onDestinationSelected(i);
-                    },
+                  child: Motion.entrance(
+                    context,
+                    _Destination(
+                      icon: _icons[i],
+                      label: _labels[i],
+                      selected: currentIndex == i,
+                      active: active,
+                      idle: idle,
+                      onTap: () {
+                        if (currentIndex != i) {
+                          Haptics.toggle();
+                        }
+                        onDestinationSelected(i);
+                      },
+                    ),
+                    i,
+                    id: 'dock',
                   ),
                 ),
               SizedBox(
                 width: 64,
-                child: _QuickAddSlot(dark: dark, onTap: onQuickAdd),
+                child: Motion.entrance(
+                  context,
+                  _QuickAddSlot(dark: dark, onTap: onQuickAdd),
+                  5,
+                  id: 'dock',
+                ),
               ),
             ],
           ),
@@ -102,51 +113,106 @@ class _Destination extends StatelessWidget {
       button: true,
       selected: selected,
       label: label,
-      child: InkWell(
-        onTap: onTap,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Icon(icon, size: 21, color: selected ? active : idle),
-            const SizedBox(height: 3),
-            Text(
-              label,
-              style: TextStyle(
-                fontFamily: 'Vazirmatn',
-                fontSize: 10,
-                fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
-                color: selected ? active : idle,
+      child: Motion.press(
+        context,
+        InkWell(
+          onTap: onTap,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              AnimatedScale(
+                scale: selected ? 1.12 : 1,
+                duration: Motion.fast,
+                curve: Curves.easeOutBack,
+                child: Icon(icon, size: 21, color: selected ? active : idle),
               ),
-            ),
-          ],
+              const SizedBox(height: 3),
+              AnimatedDefaultTextStyle(
+                duration: Motion.fast,
+                curve: Curves.easeOutCubic,
+                style: TextStyle(
+                  fontFamily: 'Vazirmatn',
+                  fontSize: 10,
+                  fontWeight: selected ? FontWeight.w700 : FontWeight.w400,
+                  color: selected ? active : idle,
+                ),
+                child: Text(label),
+              ),
+              AnimatedContainer(
+                duration: Motion.micro,
+                curve: Curves.easeOutCubic,
+                width: selected ? 18 : 0,
+                height: selected ? 2.5 : 0,
+                margin: const EdgeInsets.only(top: 2),
+                decoration: BoxDecoration(
+                  color: active,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ],
+          ),
         ),
+        minScale: 0.92,
       ),
     );
   }
 }
 
-class _QuickAddSlot extends StatelessWidget {
+class _QuickAddSlot extends StatefulWidget {
   const _QuickAddSlot({required this.dark, required this.onTap});
 
   final bool dark;
   final VoidCallback onTap;
 
   @override
+  State<_QuickAddSlot> createState() => _QuickAddSlotState();
+}
+
+class _QuickAddSlotState extends State<_QuickAddSlot> {
+  bool _pressed = false;
+
+  void _setPressed(bool value) {
+    if (_pressed != value && mounted) {
+      setState(() => _pressed = value);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Semantics(
       button: true,
       label: 'ثبت سریع',
-      child: InkWell(
-        onTap: () {
-          Haptics.tap();
-          onTap();
-        },
-        child: Center(
-          child: Icon(
-            Icons.add_rounded,
-            size: 26,
-            color: dark ? AppColors.paper : AppColors.ink,
+      child: Listener(
+        behavior: HitTestBehavior.deferToChild,
+        onPointerDown: (_) => _setPressed(true),
+        onPointerUp: (_) => _setPressed(false),
+        onPointerCancel: (_) => _setPressed(false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.86 : 1,
+          duration: _pressed ? Motion.micro : Motion.base,
+          curve: Curves.easeOutCubic,
+          child: AnimatedRotation(
+            turns: _pressed ? 0.125 : 0,
+            duration: Motion.fast,
+            curve: Curves.easeOutCubic,
+            child: InkWell(
+              onTap: () {
+                Haptics.tap();
+                widget.onTap();
+              },
+              child: Center(
+                child: Motion.pulse(
+                  context,
+                  Icon(
+                    Icons.add_rounded,
+                    size: 26,
+                    color: widget.dark ? AppColors.paper : AppColors.ink,
+                  ),
+                  id: 'quick-add',
+                ),
+              ),
+            ),
           ),
         ),
       ),

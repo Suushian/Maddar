@@ -131,12 +131,19 @@ class _AppShellState extends State<_AppShell>
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _curved,
-      builder: (BuildContext context, Widget? child) {
-        final double opacity = 0.85 + 0.15 * _curved.value;
+      child: widget.shell,
+      builder: (BuildContext context, Widget? shell) {
+        final double t = _curved.value;
         return Scaffold(
-          body: FadeTransition(
-            opacity: AlwaysStoppedAnimation<double>(opacity),
-            child: widget.shell,
+          body: Opacity(
+            opacity: 0.82 + 0.18 * t,
+            child: Transform.translate(
+              offset: Offset(0, 12 * (1 - t)),
+              child: Transform.scale(
+                scale: 0.99 + 0.01 * t,
+                child: shell,
+              ),
+            ),
           ),
           bottomNavigationBar: FloatingGlassDock(
             currentIndex: widget.shell.currentIndex,

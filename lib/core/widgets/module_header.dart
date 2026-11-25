@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:madaar/core/theme/app_colors.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 /// هدر مشترک صفحات ماژولها در RTL.
 class ModuleHeader extends StatelessWidget {
@@ -30,29 +31,43 @@ class ModuleHeader extends StatelessWidget {
                 Row(
                   children: <Widget>[
                     if (accent != null) ...<Widget>[
-                      Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: AppColors.stone.withValues(alpha: 0.75),
-                          shape: BoxShape.circle,
+                      Motion.pulse(
+                        context,
+                        Container(
+                          width: 8,
+                          height: 8,
+                          decoration: BoxDecoration(
+                            color: AppColors.stone.withValues(alpha: 0.75),
+                            shape: BoxShape.circle,
+                          ),
                         ),
+                        id: 'header-dot',
                       ),
                       const SizedBox(width: 8),
                     ],
                     Flexible(
-                      child: Text(
-                        title,
-                        style: Theme.of(context).textTheme.headlineMedium,
-                        overflow: TextOverflow.ellipsis,
+                      child: Motion.entrance(
+                        context,
+                        Text(
+                          title,
+                          style: Theme.of(context).textTheme.headlineMedium,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        0,
+                        id: 'header',
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: Theme.of(context).textTheme.bodySmall,
+                Motion.entrance(
+                  context,
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
+                  1,
+                  id: 'header',
                 ),
                 const SizedBox(height: 10),
                 Divider(
@@ -62,12 +77,16 @@ class ModuleHeader extends StatelessWidget {
               ],
             ),
           ),
-          trailing ?? IconButton(
-            tooltip: 'تنظیمات',
-            onPressed: () => context.go('/settings'),
-            icon: const Icon(Icons.tune_rounded, size: 20),
-            color: AppColors.textSecondary(context),
-          ),
+          trailing ??
+              Motion.press(
+                context,
+                IconButton(
+                  tooltip: 'تنظیمات',
+                  onPressed: () => context.go('/settings'),
+                  icon: const Icon(Icons.tune_rounded, size: 20),
+                  color: AppColors.textSecondary(context),
+                ),
+              ),
         ],
       ),
     );

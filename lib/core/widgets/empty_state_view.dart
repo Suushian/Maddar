@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
+import 'package:madaar/core/utils/motion.dart';
 
 /// جایگزین اسپینر و صفحه خالی: پیام کوتاه، آیکون و یک اقدام واضح.
 class EmptyStateView extends StatelessWidget {
@@ -29,32 +30,59 @@ class EmptyStateView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
-            Container(
-              width: 64,
-              height: 64,
-              decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.12),
-                shape: BoxShape.circle,
+            Motion.entrance(
+              context,
+              Motion.pulse(
+                context,
+                Container(
+                  width: 64,
+                  height: 64,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color, size: 28),
+                ),
+                id: 'empty-icon',
               ),
-              child: Icon(icon, color: color, size: 28),
+              0,
+              id: 'empty',
             ),
             const SizedBox(height: 16),
-            Text(
-              title,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.titleLarge,
+            Motion.entrance(
+              context,
+              Text(
+                title,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              1,
+              id: 'empty',
             ),
             const SizedBox(height: 8),
-            Text(
-              message,
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodySmall,
+            Motion.entrance(
+              context,
+              Text(
+                message,
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.bodySmall,
+              ),
+              2,
+              id: 'empty',
             ),
             if (actionLabel != null && onAction != null) ...<Widget>[
               const SizedBox(height: 20),
-              FilledButton.tonal(
-                onPressed: onAction,
-                child: Text(actionLabel!),
+              Motion.entrance(
+                context,
+                Motion.press(
+                  context,
+                  FilledButton.tonal(
+                    onPressed: onAction,
+                    child: Text(actionLabel!),
+                  ),
+                ),
+                3,
+                id: 'empty',
               ),
             ],
           ],
