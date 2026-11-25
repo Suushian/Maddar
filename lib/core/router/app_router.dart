@@ -132,15 +132,11 @@ class _AppShellState extends State<_AppShell>
     return AnimatedBuilder(
       animation: _curved,
       builder: (BuildContext context, Widget? child) {
-        final double opacity = 0.65 + 0.35 * _curved.value;
-        final double offsetY = (1 - _curved.value) * 10;
+        final double opacity = 0.85 + 0.15 * _curved.value;
         return Scaffold(
           body: FadeTransition(
             opacity: AlwaysStoppedAnimation<double>(opacity),
-            child: Transform.translate(
-              offset: Offset(0, offsetY),
-              child: widget.shell,
-            ),
+            child: widget.shell,
           ),
           bottomNavigationBar: FloatingGlassDock(
             currentIndex: widget.shell.currentIndex,

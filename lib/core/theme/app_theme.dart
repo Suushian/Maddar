@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:madaar/core/theme/app_colors.dart';
 import 'package:madaar/core/theme/app_typography.dart';
 
-/// انتقال نرم صفحهها: fade همراه جابهجایی کوتاه ۲۲۰ms با easeOutCubic.
+/// انتقال نرم صفحهها: fade ساده ۱۸۰ms بدون حرکت اضافه.
 class MadaarPageTransition extends PageTransitionsBuilder {
   MadaarPageTransition();
 
   @override
-  Duration get transitionDuration => const Duration(milliseconds: 220);
+  Duration get transitionDuration => const Duration(milliseconds: 180);
 
   @override
   Widget buildTransitions<T>(
@@ -22,16 +22,7 @@ class MadaarPageTransition extends PageTransitionsBuilder {
       curve: Curves.easeOutCubic,
       reverseCurve: Curves.easeInCubic,
     );
-    return FadeTransition(
-      opacity: curved,
-      child: SlideTransition(
-        position: Tween<Offset>(
-          begin: const Offset(0, 0.035),
-          end: Offset.zero,
-        ).animate(curved),
-        child: child,
-      ),
-    );
+    return FadeTransition(opacity: curved, child: child);
   }
 }
 
@@ -123,12 +114,12 @@ abstract final class AppTheme {
         surfaceTintColor: Colors.transparent,
         showDragHandle: true,
         shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
         ),
       ),
       snackBarTheme: SnackBarThemeData(
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       ),
       visualDensity: VisualDensity.standard,
     );

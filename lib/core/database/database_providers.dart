@@ -10,6 +10,7 @@ import 'package:path_provider/path_provider.dart';
 final FutureProvider<AppDatabase> appDatabaseProvider =
     FutureProvider<AppDatabase>((ref) async {
   final AppDatabase db = await openAppDatabase();
+  ref.keepAlive();
   ref.onDispose(() {
     unawaited(db.close());
   });
@@ -20,6 +21,7 @@ final FutureProvider<TasksRepository> tasksRepositoryProvider =
     FutureProvider<TasksRepository>((ref) async {
   final AppDatabase db = await ref.watch(appDatabaseProvider.future);
   final TasksRepository repo = TasksRepository(db);
+  ref.keepAlive();
   ref.onDispose(repo.dispose);
   return repo;
 });
@@ -28,6 +30,7 @@ final FutureProvider<HabitsRepository> habitsRepositoryProvider =
     FutureProvider<HabitsRepository>((ref) async {
   final AppDatabase db = await ref.watch(appDatabaseProvider.future);
   final HabitsRepository repo = HabitsRepository(db);
+  ref.keepAlive();
   ref.onDispose(repo.dispose);
   return repo;
 });
@@ -36,6 +39,7 @@ final FutureProvider<FinanceRepository> financeRepositoryProvider =
     FutureProvider<FinanceRepository>((ref) async {
   final AppDatabase db = await ref.watch(appDatabaseProvider.future);
   final FinanceRepository repo = FinanceRepository(db);
+  ref.keepAlive();
   ref.onDispose(repo.dispose);
   return repo;
 });
@@ -44,6 +48,7 @@ final FutureProvider<JournalRepository> journalRepositoryProvider =
     FutureProvider<JournalRepository>((ref) async {
   final AppDatabase db = await ref.watch(appDatabaseProvider.future);
   final JournalRepository repo = JournalRepository(db);
+  ref.keepAlive();
   ref.onDispose(repo.dispose);
   return repo;
 });
@@ -52,6 +57,7 @@ final FutureProvider<SettingsRepository> settingsRepositoryProvider =
     FutureProvider<SettingsRepository>((ref) async {
   final AppDatabase db = await ref.watch(appDatabaseProvider.future);
   final SettingsRepository repo = SettingsRepository(db);
+  ref.keepAlive();
   ref.onDispose(repo.dispose);
   return repo;
 });

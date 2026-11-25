@@ -63,7 +63,7 @@ class _UniversalQuickAddState extends State<UniversalQuickAdd>
         height: MediaQuery.sizeOf(context).height * 0.72,
         decoration: BoxDecoration(
           color: AppColors.bgElevated(context).withValues(alpha: 0.97),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
           border: Border.all(color: AppColors.borderSubtle(context)),
         ),
         child: Column(

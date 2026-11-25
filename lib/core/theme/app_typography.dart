@@ -32,31 +32,31 @@ abstract final class AppTypography {
 
     return TextTheme(
       displayLarge: _style(
-        size: 28,
-        weight: FontWeight.w800,
+        size: 24,
+        weight: FontWeight.w600,
         color: primary,
         height: 1.2,
       ),
       headlineMedium: _style(
-        size: 22,
-        weight: FontWeight.w700,
+        size: 20,
+        weight: FontWeight.w600,
         color: primary,
         height: 1.25,
       ),
       titleLarge: _style(
-        size: 18,
-        weight: FontWeight.w700,
+        size: 16,
+        weight: FontWeight.w600,
         color: primary,
       ),
       titleMedium: _style(
-        size: 16,
-        weight: FontWeight.w500,
+        size: 14,
+        weight: FontWeight.w600,
         color: primary,
       ),
-      bodyLarge: _style(size: 16, weight: FontWeight.w400, color: primary),
-      bodyMedium: _style(size: 15, weight: FontWeight.w400, color: primary),
-      bodySmall: _style(size: 13, weight: FontWeight.w400, color: secondary),
-      labelLarge: _style(size: 14, weight: FontWeight.w500, color: primary),
+      bodyLarge: _style(size: 14, weight: FontWeight.w400, color: primary),
+      bodyMedium: _style(size: 14, weight: FontWeight.w400, color: primary),
+      bodySmall: _style(size: 12, weight: FontWeight.w400, color: secondary),
+      labelLarge: _style(size: 13, weight: FontWeight.w500, color: primary),
       labelMedium: _style(size: 12, weight: FontWeight.w500, color: secondary),
       labelSmall: _style(size: 11, weight: FontWeight.w500, color: secondary),
     );

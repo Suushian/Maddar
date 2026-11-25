@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:madaar/core/database/models.dart';
@@ -25,7 +27,6 @@ class OnboardingPage extends ConsumerStatefulWidget {
 }
 
 class _OnboardingPageState extends ConsumerState<OnboardingPage> {
-  final PageController _page = PageController();
   final TextEditingController _name = TextEditingController();
   final TextEditingController _budget = TextEditingController();
   final TextEditingController _reminder = TextEditingController(text: '21:00');
@@ -45,7 +46,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
 
   @override
   void dispose() {
-    _page.dispose();
     _name.dispose();
     _budget.dispose();
     _reminder.dispose();
@@ -65,7 +65,7 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               Align(
                 alignment: Alignment.centerLeft,
                 child: TextButton(
-                  onPressed: () => _finish(saveValues: false),
+                  onPressed: () => unawaited(_finish(saveValues: false)),
                   child: const Text('رد کردن'),
                 ),
               ),
@@ -116,21 +116,15 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
                 style: FilledButton.styleFrom(
                   minimumSize: const Size.fromHeight(54),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18),
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
                 onPressed: () {
                   if (_step < 2) {
                     Haptics.tap();
-                    _page.animateToPage(
-                      _step + 1,
-                      duration: Motion.reduced(context)
-                          ? Duration.zero
-                          : const Duration(milliseconds: 260),
-                      curve: Curves.easeOut,
-                    );
+                    setState(() => _step += 1);
                   } else {
-                    _finish(saveValues: true);
+                    unawaited(_finish(saveValues: true));
                   }
                 },
                 child: Text(_step == 2 ? 'ورود به مدار' : 'ادامه'),
@@ -259,15 +253,4 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
     }
   }
 
-  void _onPageChanged(int index) => setState(() => _step = index);
-
-  @override
-  void initState() {
-    super.initState();
-    _page.addListener(() {
-      if (_page.page != null && _page.page!.round() != _step) {
-        _onPageChanged(_page.page!.round());
-      }
-    });
-  }
 }
